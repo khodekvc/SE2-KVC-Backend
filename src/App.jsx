@@ -7,7 +7,7 @@ import SignupPetOwner from "./pages/SignupPetOwner";
 import SignupEmployee from "./pages/SignupEmployee";
 import PetInfo from "./pages/PetInfo"; 
 import AccessCode from "./pages/AccessCode"; 
-import HeroSection from './pages/Landing';
+import Landing from './pages/Landing';
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
       <Navbar />
       <div className="container">
         <Routes>
-        <Route path="/" element={<HeroSection/>} />
+        <Route path="/" element={<Landing/>} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/signup-petowner" element={<SignupPetOwner />} />
           <Route path="/signup-employee" element={<SignupEmployee />} />
