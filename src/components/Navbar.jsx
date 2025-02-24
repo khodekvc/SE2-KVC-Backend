@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
 import '../css/NavBar.css';
 import { Button } from './Button';
@@ -7,14 +7,18 @@ import { Button } from './Button';
 function NavBar() {
   const [click, setClick] = useState(false); 
   const [button, setButton] = useState(true); 
+  const location = useLocation(); // Use location to detect the current path
   const handleClick = () => setClick(!click); 
   const closeMobileMenu = () => setClick(false); 
 
   const showButton = () => { 
-    if(window.innerWidth <= 960) 
-      { setButton(false); } 
-    else { setButton(true); } 
+    if (window.innerWidth <= 960) { 
+      setButton(false); 
+    } else { 
+      setButton(true); 
+    } 
   }; 
+
   useEffect(() => {
     showButton();
     window.addEventListener('resize', showButton);
@@ -32,37 +36,67 @@ function NavBar() {
         </div>
         <ul className={click ? 'nav-menu active' : 'nav-menu'}>
           <li className='nav-item'>
-            <ScrollLink 
-              to="home" 
-              smooth={true} 
-              duration={500} 
-              className="nav-links" 
-              onClick={closeMobileMenu}
-            >
-              HOME
-            </ScrollLink>
+            {location.pathname === '/' ? (
+              <ScrollLink
+                to="home"
+                smooth={true}
+                duration={500}
+                className="nav-links"
+                onClick={closeMobileMenu}
+              >
+                HOME
+              </ScrollLink>
+            ) : (
+              <RouterLink
+                to="/"
+                className="nav-links"
+                onClick={closeMobileMenu}
+              >
+                HOME
+              </RouterLink>
+            )}
           </li>
           <li className='nav-item'>
-            <ScrollLink 
-              to="about" 
-              smooth={true} 
-              duration={500} 
-              className="nav-links" 
-              onClick={closeMobileMenu}
-            >
-              ABOUT
-            </ScrollLink>
+            {location.pathname === '/' ? (
+              <ScrollLink
+                to="about"
+                smooth={true}
+                duration={500}
+                className="nav-links"
+                onClick={closeMobileMenu}
+              >
+                ABOUT
+              </ScrollLink>
+            ) : (
+              <RouterLink
+                to="/"
+                className="nav-links"
+                onClick={closeMobileMenu}
+              >
+                ABOUT
+              </RouterLink>
+            )}
           </li>
           <li className='nav-item'>
-            <ScrollLink 
-              to="contact" 
-              smooth={true} 
-              duration={500} 
-              className="nav-links" 
-              onClick={closeMobileMenu}
-            >
-              CONTACT US
-            </ScrollLink>
+            {location.pathname === '/' ? (
+              <ScrollLink
+                to="contact"
+                smooth={true}
+                duration={500}
+                className="nav-links"
+                onClick={closeMobileMenu}
+              >
+                CONTACT US
+              </ScrollLink>
+            ) : (
+              <RouterLink
+                to="/"
+                className="nav-links"
+                onClick={closeMobileMenu}
+              >
+                CONTACT US
+              </RouterLink>
+            )}
           </li>
           <li className='nav-item'>
             <RouterLink 
@@ -79,4 +113,5 @@ function NavBar() {
     </nav>
   );
 }
+
 export default NavBar;
