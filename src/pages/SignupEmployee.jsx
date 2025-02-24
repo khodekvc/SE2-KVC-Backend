@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from "react";
+import Navbar from '../components/Navbar';
 import { Button } from '../components/Button';
 import FormGroup from '../components/FormGroup';
 import "../css/Forms.css";
@@ -26,21 +27,21 @@ const SignupEmployee = () => {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="signup-container">
-      <div left-alt>
       <div className="left-section">
         <h1>KHO<br /> VETERINARY<br /> CLINIC</h1>
-      </div>
-      <div className="alternate-links">
+        <div className="alternate-links">
           <Button buttonStyle='btn--primary' to='/signup-petowner' className="form-btn-2">Sign up as Pet Owner</Button>
           <p>Not an Employee?</p>
-      </div>
+        </div>
       </div>
       <div className="right-section">
         <h2>Create Account</h2>
         <p>Become part of our team!</p>
         <form onSubmit={handleSubmit}>
-          <div className="form-row">
+          <div className="signup-form-row">
             <FormGroup 
               label="First Name" 
               type="text" 
@@ -105,7 +106,7 @@ const SignupEmployee = () => {
             onChange={handleChange} 
             required 
           />
-          <div className="form-group captcha">
+          <div className="forms-group captcha">
             <label htmlFor="captcha">Enter Captcha</label>
             <div className="captcha-container">
               <img className="generated" src="LoginServlet" alt="CAPTCHA" id="captchaImage" />
@@ -119,10 +120,11 @@ const SignupEmployee = () => {
               />
             </div>
           </div>
-          <Button buttonStyle='btn--primary' to='/signup-employee-accesscode' className="form-btn-1">NEXT</Button>
+          <Button buttonStyle='btn--primary' to='/signup-employee-accesscode' className="form-btn-1">SIGN UP</Button>
         </form>
       </div>
     </div>
+  </>
   );
 };
 

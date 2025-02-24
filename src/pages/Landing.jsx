@@ -1,5 +1,6 @@
 import React from 'react';
 import '../css/Landing.css';
+import Navbar from "../components/Navbar";
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,15 +9,12 @@ import { faLocationDot, faPhone, faEnvelope, faClock } from '@fortawesome/free-s
 function Landing() {
   return (
     <>
+     <Navbar />
       <div className="hero-section-wrapper">
         <section className="hero" id="home">
           <div className="hero-content">
             <h1>
-              KHO
-              <br />
-              VETERINARY
-              <br />
-              CLINIC
+              KHO <br /> VETERINARY <br /> CLINIC
             </h1>
             <p>Four Paws, Two Feet, One Heart</p>
             <Button
@@ -51,7 +49,7 @@ function Landing() {
           </div>
           <div className='about-right-section'>
             <div className="about-services">
-              <h2>WE OFFER 24 HOURS<br />VET SERVICES</h2>
+              <h2>WE OFFER 24 HOURS <br />VET SERVICES</h2>
             </div>
             <div className="dog-text">
               <div className="about-text">
@@ -80,6 +78,7 @@ function Landing() {
             </div>
           </div>
         </section>
+        </div>
 
         <div className="contact-section-wrapper"> 
           <section className="contact" id="contact">
@@ -101,37 +100,37 @@ function Landing() {
               </div>
             </div>
 
-            <div className="details">
-              <div className="detail-item">
-                <FontAwesomeIcon icon={faLocationDot} className="icon"/>
+            <div className="contact-details">
+              <div className="contact-detail-item">
+                <FontAwesomeIcon icon={faLocationDot} className="contact-icon"/>
                 <p>
                   <strong>LOCATION</strong>
                 </p>
                 <p>730 Earnshaw st, Cayco St, Sampaloc, Manila, 1008 Metro Manila</p>
               </div>
-              <div className="detail-item">
-                <FontAwesomeIcon icon={faPhone} className="icon"/>
+              <div className="contact-detail-item">
+                <FontAwesomeIcon icon={faPhone} className="contact-icon"/>
                 <p>
                   <strong>PHONE NUMBER</strong>
                 </p>
                 <p>0991 666 0540</p>
               </div>
-              <div className="detail-item">
-                <FontAwesomeIcon icon={faEnvelope} className="icon"/>
+              <div className="contact-detail-item">
+                <FontAwesomeIcon icon={faEnvelope} className="contact-icon"/>
                 <p>
                   <strong>EMAIL</strong>
                 </p>
                 <p>khovetclinic@email.com</p>
               </div>
-              <div className="detail-item">
-                <FontAwesomeIcon icon={faClock} className="icon"/>
+              <div className="contact-detail-item">
+                <FontAwesomeIcon icon={faClock} className="contact-icon"/>
                 <p>
                   <strong>WORKING HOURS</strong>
                 </p>
                 <p>
-                  Monday to Sunday
+                  Monday to Sunday 
                   <br />
-                  8:00 AM to 8:00 PM
+                   8:00 AM to 8:00 PM
                 </p>
               </div>
             </div>
@@ -139,7 +138,7 @@ function Landing() {
           </section>
         </div>
       
-      </div>
+     
     </>
   )
 }

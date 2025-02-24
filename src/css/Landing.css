@@ -7,10 +7,6 @@
     min-height: 100vh;
 }
 
-.hero-section-wrapper {
-  padding-top: 5px;
-}
-
 .hero {
     width: 100vw;
     min-height: 100vh;
@@ -60,7 +56,7 @@
     padding-left: 200px;
     position: relative;
     z-index: 1;
-    top: 1px;
+    bottom: 35px;
   }
 
   .cat2 img {
@@ -166,7 +162,6 @@
   .contact {
     text-align: center;
     background-color: #FFFEF1; 
-    padding-top: 4rem;
   }
   
   .contact h2 {
@@ -193,14 +188,14 @@
     height: auto;
   }
   
-  .details {
+  .contact-details {
     display: flex;
     justify-content: space-evenly;
     flex-wrap: wrap;
     margin-bottom: 3rem;
   }
   
-  .detail-item {
+  .contact-detail-item {
     background-color: #FFF;
     border: 3px solid #FF8C00;
     border-radius: 25px;
@@ -210,17 +205,17 @@
     max-width: 250px;
   }
   
-  .detail-item p {
+  .contact-detail-item p {
     margin: 0.5rem 0;
     color: #FF8C00;
   }
   
-  .detail-item strong {
+  .contact-detail-item strong {
     color: #FF8C00;
     font-size: 1.1rem;
   }
 
-  .icon {
+  .contact-icon {
     font-size: 3rem;
     color: #FF8C00;
     margin-bottom: 1rem;
@@ -277,6 +272,10 @@
       width: 200px;
       height: auto;
       margin-left: 100px;
+    }
+
+    .contact-details {
+      gap: 1.5rem;
     }
     
   }
@@ -349,6 +348,10 @@
       height: auto;
       margin-left: -150px;
     }
+
+    .contact-details {
+      gap: 1.5rem;
+    }
     
   }
 
@@ -363,9 +366,9 @@
       font-size: 25px;
     }
 
-    .btn {
+    .hero-content .btn--primary {
       padding: 0.5rem 3rem;
-      font-size: 18px; 
+      font-size: 18px;
     }
 
     .cat2 {
@@ -409,6 +412,10 @@
     .google-map iframe {
       width: 600px;
       height: 345px;
+    }
+
+    .contact-details {
+      gap: 1.5rem;
     }
   }
 
@@ -457,7 +464,7 @@
   }
 
   .about-services h2 {
-    margin-top: 20px;
+    margin-top: 50px;
   }
 
   .dog2 img {
@@ -469,6 +476,9 @@
   .google-map iframe {
     width: 500px;
     height: 290px;
+  }
+  .contact-details {
+    gap: 1.5rem;
   }
 
 }
@@ -489,12 +499,11 @@
   
   .cat2 {
     padding-left: 300px;
-    z-index: 1;
   }
 
   .cat2 img {
-    width: 350px;
-    height: 200px;
+    width: 300px;
+    height: auto;
   }
 
   .about {
@@ -533,7 +542,7 @@
     height: auto;
   }
   
-  .details {
+  .contact-details {
     gap: 1.5rem;
   }
 
@@ -564,7 +573,7 @@
 
   .cat2 img {
     width: 250px;
-    height: 190px;
+    height: auto;
   }
 
   .about {
@@ -593,7 +602,7 @@
   }
 
   .about-services {
-  padding-top: 10px;;
+   padding-top: 5px;
    padding-bottom: 10px;
   }
 
@@ -621,13 +630,14 @@
     height: auto;
   }
   
-  .details {
+  .contact-details {
     gap: 1.5rem;
   }
 
   .contact h2 {
     font-size: 2rem;
   }
+  
 
 }
 
@@ -648,7 +658,6 @@
   .cat2 {
     top: 3px;
     padding-left: 130px;
-    z-index: 1;
   }
 
   .cat2 img {
@@ -685,7 +694,7 @@
   }
 
   .about-services {
-    padding-top: 10px;
+   padding-top: 5px;
    padding-bottom: 10px;
    text-align: center;
   }
@@ -718,7 +727,7 @@
     height: auto;
   }
   
-  .details {
+  .contact-details {
     gap: 1.5rem;
   }
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Navbar from "../components/Navbar";
 import { Button } from '../components/Button';
 import FormGroup from '../components/FormGroup';
 import "../css/Forms.css";
@@ -24,21 +25,21 @@ const SignupPetOwner = () => {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="signup-container">
-      <div left-alt>
-            <div className="left-section">
-              <h1>KHO<br /> VETERINARY<br /> CLINIC</h1>
-            </div>
-            <div className="alternate-links">
-                <Button buttonStyle='btn--primary' to='/signup-employee' className="form-btn-2">Sign up as Employee</Button>
-                <p>Not a Pet Owner?</p>
-            </div>
-            </div>
+      <div className="left-section">
+        <h1>KHO<br /> VETERINARY<br /> CLINIC</h1>
+        <div className="alternate-links">
+          <Button buttonStyle='btn--primary' to='/signup-employee' className="form-btn-2">Sign up as Employee</Button>
+          <p>Not a Pet Owner?</p>
+        </div>
+      </div>
       <div className="right-section">
         <h2>Create Account</h2>
         <p>Your pet's care starts here!</p>
         <form onSubmit={handleSubmit}>
-          <div className="form-row">
+          <div className="signup-form-row">
             <FormGroup 
               label="First Name" 
               type="text" 
@@ -57,7 +58,7 @@ const SignupPetOwner = () => {
             />
           </div>
           
-          <div className="form-row">
+          <div className="signup-form-row">
             <FormGroup 
               label="Email" 
               type="email" 
@@ -103,12 +104,13 @@ const SignupPetOwner = () => {
             required 
           />
 
-          <Button buttonStyle='btn--primary' to='/signup-petowner-petinfo' className="form-btn-1">NEXT</Button>
+          <Button buttonStyle='btn--secondary' to='/signup-petowner-petinfo' className="form-btn-3">NEXT</Button>
         </form>
         
       </div>
 
     </div>
+    </>
   );
 };
 
