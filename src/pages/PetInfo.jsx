@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Navbar from "../components/Navbar";
 import { Button } from '../components/Button';
 import FormGroup from '../components/FormGroup';
 import "../css/Forms.css";
@@ -23,17 +24,21 @@ const PetInfo = () => {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="petinfo-container">
-      <div className="left-section">
-        <h1>KHO<br /> VETERINARY<br /> CLINIC</h1>
-      </div>
-
+        <div className="left-section">
+          <h1>KHO<br /> VETERINARY<br /> CLINIC</h1>
+          <div className="alternate-links">
+            <Button buttonStyle='btn--primary' to='/signup-employee' className="form-btn-2">Sign up as Employee</Button>
+            <p>Not a Pet Owner?</p>
+          </div>
+        </div>
       <div className="right-section">
         <h2>Create Account</h2>
         <p>Your pet's care starts here!</p>
-
         <form onSubmit={handleSubmit}>
-          <div className="form-row">
+          <div className="signup-form-row">
             <FormGroup 
               label="Pet Name" 
               type="text" 
@@ -69,7 +74,7 @@ const PetInfo = () => {
             </div>
           </div>
 
-          <div className="form-row">
+          <div className="signup-form-row">
             <FormGroup 
               label="Pet Species" 
               type="text" 
@@ -95,7 +100,7 @@ const PetInfo = () => {
             onChange={handleChange} 
           />
 
-          <div className="form-group captcha">
+          <div className="forms-group captcha">
             <label htmlFor="captcha">Enter Captcha</label>
             <div className="captcha-container">
               <img className="generated" src="SignUpPetOwnerServlet" alt="CAPTCHA" id="captchaImage" />
@@ -112,15 +117,12 @@ const PetInfo = () => {
 
           <div className="button-group">
             <Button buttonStyle='btn--secondary' onClick={() => window.history.back()} className="form-btn-3">BACK</Button>
-            <Button buttonStyle='btn--primary' type="submit" className="form-btn-1">SIGN UP</Button>
+            <Button buttonStyle='btn--primary' type="submit" className="form-btn-1" to="/patients">SIGN UP</Button>
           </div>
         </form>
       </div>
-      <div className="alternate-links">
-          <Button buttonStyle='btn--primary' to='/signup-employee' className="form-btn-2">Sign up as Employee</Button>
-          <p>Not a Pet Owner?</p>
-        </div>
     </div>
+    </>
   );
 };
 

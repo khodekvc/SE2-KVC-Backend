@@ -1,4 +1,5 @@
 import React from 'react';
+import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { Button } from '../components/Button';
 import FormGroup from '../components/FormGroup';
@@ -17,6 +18,8 @@ function LoginForm() {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="login-container">
       <div className="left-section">
         <h1 className='login-h1'>KHO<br /> VETERINARY<br /> CLINIC</h1>
@@ -44,7 +47,7 @@ function LoginForm() {
           <div className="forgot">
             <a href="#">Forgot Password?</a>
           </div>
-          <div className="form-group captcha">
+          <div className="forms-group captcha">
             <label htmlFor="captcha">Enter Captcha</label>
             <div className="captcha-container">
               <img className="generated" alt="CAPTCHA" />
@@ -58,10 +61,11 @@ function LoginForm() {
               />
             </div>
           </div>
-          <Button buttonStyle='btn--primary' to='/login' className="form-btn-1">LOGIN</Button>
+          <Button buttonStyle='btn--primary' to='/patients' className="form-btn-1">LOGIN</Button>
         </form>
       </div>
     </div>
+    </>
   );
 };
 
