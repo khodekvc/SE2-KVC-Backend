@@ -6,7 +6,6 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const { sendEmail } = require('./utils/emailUtility');
 
 // database and route handler imports
 const db = require("./config/db");
