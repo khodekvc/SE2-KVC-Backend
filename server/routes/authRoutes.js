@@ -88,6 +88,8 @@ router.post("/login", async (req, res) => {
 });
 
 // Routes for user signup and logout (delegated to authController)
+router.post("/signup/petowner-step1", authController.signupPetOwnerStep1);
+router.post("/signup/petowner-step2", authController.signupPetOwnerStep2);
 router.post("/signup/employee", authController.signupEmployee);
 router.post("/logout", authController.logoutUser);
 

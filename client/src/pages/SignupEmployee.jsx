@@ -1,29 +1,94 @@
-import React from 'react';
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from '../components/Navbar';
 import { Button } from '../components/Button';
 import FormGroup from '../components/FormGroup';
 import "../css/Forms.css";
 
-const SignupEmployee = () => {
+const SignupEmployee = ({ captcha, setCaptcha }) => {
   const [formData, setFormData] = useState({
-    fname: "",
-    lname: "",
+    firstname: "",
+    lastname: "",
     email: "",
     contact: "",
     role: "",
     password: "",
     confirmPassword: "",
-    captcha: "",
+    captchaInput: "",
   });
+
+  const [captchaImage, setCaptchaImage] = useState("");
+  const [captchaKey, setCaptchaKey] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
+
+  const fetchCaptcha = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/auth/captcha", {
+        method: "GET",
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+
+        console.log("Fetched CAPTCHA Data:", data);
+
+        setCaptchaImage(data.image);
+        setCaptchaKey(data.captchaText);
+
+      } else {
+        console.error("Failed to load CAPTCHA");
+      }
+    } catch (error) {
+      console.error("Error fetching CAPTCHA:", error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Signing up employee:", formData);
+    setLoading(true);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const response = await fetch("http://localhost:5000/auth/signup/employee", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          ...formData,
+          captchaKey,
+          captchaResponse: formData.captchaInput,
+        }),
+      });
+      const data = await response.json();
+
+      console.log("Signup Response:", data);
+
+      if (response.ok) {
+        alert("Employee signup successful!");
+        window.location.href = "/dashboard";
+      } else {
+        setError(data.error || "❌ Signup failed. Please try again.");
+        fetchCaptcha();
+      }
+    } catch (error) {
+      setError("❌ Server error. Please try again later.");
+    }
+    setLoading(false);
   };
 
   return (
@@ -39,14 +104,17 @@ const SignupEmployee = () => {
       </div>
       <div className="right-section">
         <h2>Create Account</h2>
-        <p>Become part of our team!</p>
+          <p>Become part of our team!</p>
+          
+          {error && <p className="error-message">{error}</p>}
+
         <form onSubmit={handleSubmit}>
           <div className="signup-form-row">
             <FormGroup 
               label="First Name" 
               type="text" 
               name="fname" 
-              value={formData.fname} 
+              value={formData.firstname} 
               onChange={handleChange} 
               required 
             />
@@ -54,7 +122,7 @@ const SignupEmployee = () => {
               label="Last Name" 
               type="text" 
               name="lname" 
-              value={formData.lname} 
+              value={formData.lastname} 
               onChange={handleChange} 
               required 
             />
@@ -109,13 +177,22 @@ const SignupEmployee = () => {
           <div className="forms-group captcha">
             <label htmlFor="captcha">Enter Captcha</label>
             <div className="captcha-container">
-              <img className="generated" src="LoginServlet" alt="CAPTCHA" id="captchaImage" />
+              {captchaImage ? (
+                <img
+                  className="generated"
+                  src={captchaImage.startsWith("data:image") ? captchaImage : `data:image/png;base64,${captchaImage}`}
+                  alt="CAPTCHA verification"
+                  id="captchaImage"
+                />
+              ) : (
+                <p>Loading...</p> // ✅ Fallback text while loading
+              )}
               <input 
                 type="text" 
                 id="captcha" 
                 name="captcha" 
                 value={formData.captcha} 
-                onChange={handleChange} 
+                onChange={(e) => setCaptcha(e.target.value)} 
                 required 
               />
             </div>

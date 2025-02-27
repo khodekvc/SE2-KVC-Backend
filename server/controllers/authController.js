@@ -73,6 +73,97 @@ exports.loginUser = async (req, res) => {
     }
 };
 
+// pet owner signup (step 1)
+exports.signupPetOwnerStep1 = async (req, res) => {
+    const { fname, lname, email, contact, address, password, confirmPassword } = req.body;
+
+    if (!fname || !lname || !email || !contact || !address || !password || !confirmPassword) {
+        return res.status(400).json({ error: "❌ All fields are required!" });
+    }
+
+    if (password !== confirmPassword) {
+        return res.status(400).json({ error: "❌ Passwords do not match!" });
+    }
+
+    try {
+        const [existingUser] = await db.query("SELECT * FROM users WHERE user_email = ?", [email]);
+        if (existingUser.length > 0) {
+            return res.status(400).json({ error: "❌ Email already in use." });
+        }
+
+        // hash password before storing
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // temporarily store in session to allow backtracking
+        req.session.petOwnerData = {
+            fname, lname, email, contact, address, password: hashedPassword
+        };
+
+        res.json({ message: "✅ Step 1 completed. Proceed to pet info." });
+    } catch (err) {
+        console.error("Database Error:", err);
+        res.status(500).json({ error: "❌ Database error." });
+    }
+};
+
+// signup with pet info (step 2)
+exports.signupPetOwnerStep2 = async (req, res) => {
+    const { petname, gender, species, breed, birthdate, captchaInput } = req.body;
+
+    // validate CAPTCHA
+    if (!req.session.captcha || captchaInput !== req.session.captcha) {
+        return res.status(400).json({ error: "❌ Incorrect CAPTCHA!" });
+    }
+    req.session.captcha = null;  // Clear CAPTCHA after validation
+
+    // validate session data
+    if (!req.session.petOwnerData) {
+        return res.status(400).json({ error: "❌ Personal info missing. Restart signup process." });
+    }
+
+    const { fname, lname, email, contact, address, password } = req.session.petOwnerData;
+
+    try {
+        // insert pet owner into users table
+        const [userResult] = await db.query(
+            "INSERT INTO users (user_email, user_password, user_firstname, user_lastname, user_contact, user_role) VALUES (?, ?, ?, ?, ?, ?)",
+            [email, password, fname, lname, contact, "owner"]
+        );
+        const userId = userResult.insertId;
+
+        // insert address into owner table
+        await db.query(
+            "INSERT INTO owner (user_id, owner_address) VALUES (?, ?)",
+            [userId, address]
+        );
+
+        // insert pet details into pet_info table
+        await db.query(
+            "INSERT INTO pet_info (pet_name, pet_gender, pet_species, pet_breed, pet_birthday, pet_vitality, pet_status, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [petname, gender, species, breed, birthdate, true, true, userId]
+        );
+
+        // generate authentication token
+        const token = generateToken(userId);
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 60 * 60 * 1000
+        });
+
+        // clear session data after successful signup
+        req.session.petOwnerData = null;
+
+        res.status(201).json({ message: "✅ Pet Owner account created successfully!" });
+
+    } catch (error) {
+        console.error("Signup Error:", error);
+        res.status(500).json({ error: "❌ Server error during signup." });
+    }
+};
+
 // employee signup
 exports.signupEmployee = async (req, res) => {
     console.log("Received employee signup request:", req.body);
