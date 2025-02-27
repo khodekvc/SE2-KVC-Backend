@@ -3,12 +3,14 @@ const { generateCaptcha, generateCaptchaImage } = require("../utils/captchaUtili
 const authController = require("../controllers/authController");
 const db = require("../config/db");
 const bcrypt = require('bcrypt');
+const crypto = require("crypto");
 
 console.log("DB module:", db);
 
 // create router instance
 const router = express.Router();
 const captchaStore = new Map();
+const pendingSignups = new Map();
 
 // Postman test: generate captcha
 router.get("/captcha", (req, res) => {
@@ -90,7 +92,8 @@ router.post("/login", async (req, res) => {
 // Routes for user signup and logout (delegated to authController)
 router.post("/signup/petowner-step1", authController.signupPetOwnerStep1);
 router.post("/signup/petowner-step2", authController.signupPetOwnerStep2);
-router.post("/signup/employee", authController.signupEmployee);
 router.post("/logout", authController.logoutUser);
+router.post("/signup/employee", authController.signupEmployeeRequest);
+router.post("/signup/employee-verify", authController.signupEmployeeComplete);
 
 module.exports = router;
