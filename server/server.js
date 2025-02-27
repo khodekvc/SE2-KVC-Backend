@@ -12,6 +12,9 @@ const db = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const dbTestRoutes = require("./routes/dbTestRoutes");
 const usersRoutes = require("./routes/usersRoutes");
+const petRoutes = require("./routes/petRoutes");
+
+
 
 
 // express app initializer
@@ -67,6 +70,7 @@ app.get('/session-data', (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/db-test", dbTestRoutes);
 app.use("/user", usersRoutes);
+app.use("/api/pets", petRoutes);
 
 // starts the server
 app.listen(port, () => {

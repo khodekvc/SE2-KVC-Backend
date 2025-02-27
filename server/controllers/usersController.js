@@ -10,6 +10,11 @@ exports.updateProfile = async (req, res) => {
         return res.status(401).json({ error: "❌ Unauthorized. Please log in." });
     }
 
+    // Validate inputs (ensure no NULL values)
+    if (!firstname || !lastname || !email || !contact) {
+        return res.status(400).json({ error: "❌ All fields are required!" });
+    }
+
     try {
         // Check if the email is already taken by another user
         const [existingUser] = await db.execute(
@@ -46,6 +51,10 @@ exports.changePassword = async (req, res) => {
 
     if (!currentPassword || !newPassword || !confirmNewPassword) {
         return res.status(400).json({ error: "❌ All fields are required!" });
+    }
+
+    if (newPassword.trim() === "" || confirmNewPassword.trim() === "") {
+        return res.status(400).json({ error: "❌ Password cannot be empty!" });
     }
 
     if (newPassword !== confirmNewPassword) {
