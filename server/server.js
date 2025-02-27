@@ -11,6 +11,8 @@ const bodyParser = require("body-parser");
 const db = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const dbTestRoutes = require("./routes/dbTestRoutes");
+const usersRoutes = require("./routes/usersRoutes");
+
 
 // express app initializer
 const app = express();
@@ -64,6 +66,7 @@ app.get('/session-data', (req, res) => {
 // route handlers
 app.use("/auth", authRoutes);
 app.use("/db-test", dbTestRoutes);
+app.use("/user", usersRoutes);
 
 // starts the server
 app.listen(port, () => {
