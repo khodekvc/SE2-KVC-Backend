@@ -98,7 +98,7 @@ exports.signupPetOwnerStep1 = async (req, res) => {
 
         // temporarily store in session to allow backtracking
         req.session.petOwnerData = {
-            fname, lname, email, contact, address, password: hashedPassword
+            fname, lname, email, contact, address, altcontact1, altperson1, password: hashedPassword
         };
 
         res.json({ message: "✅ Step 1 completed. Proceed to pet info." });
@@ -123,7 +123,7 @@ exports.signupPetOwnerStep2 = async (req, res) => {
         return res.status(400).json({ error: "❌ Personal info missing. Restart signup process." });
     }
 
-    const { fname, lname, email, contact, address, password } = req.session.petOwnerData;
+    const { fname, lname, email, contact, address, password, altcontact1, altperson1 } = req.session.petOwnerData;
 
     try {
         // insert pet owner into users table
@@ -135,8 +135,8 @@ exports.signupPetOwnerStep2 = async (req, res) => {
 
         // insert address into owner table
         await db.query(
-            "INSERT INTO owner (user_id, owner_address) VALUES (?, ?)",
-            [userId, address]
+            "INSERT INTO owner (user_id, owner_address, owner_alt_person1, owner_alt_contact1) VALUES (?, ?, ?, ?)",
+            [userId, address, altperson1, altcontact1]
         );
 
         // insert pet details into pet_info table
