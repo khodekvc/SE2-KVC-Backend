@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const UserModel = require("../models/userModel");
 const PetModel = require("../models/petModel");
 const { generateCaptcha, generateCaptchaImage } = require("../utils/captchaUtility");
+const { hashPassword } = require("../utils/passwordUtility");
 const { generateToken } = require("../utils/authUtility");
 const { sendEmail } = require("../utils/emailUtility");
 
@@ -63,7 +64,7 @@ exports.signupPetOwnerStep1 = async (req, res) => {
         }
 
         req.session.petOwnerData = {
-            fname, lname, email, contact, address, password: await UserModel.hashPassword(password)
+            fname, lname, email, contact, address, password: await hashPassword(password)
         };
 
         res.json({ message: "✅ Step 1 completed. Proceed to pet info." });
@@ -170,7 +171,7 @@ exports.signupEmployeeComplete = async (req, res) => {
             return res.status(400).json({ error: "❌ Invalid access code." });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await hashPassword(password);
         const userId = await UserModel.createEmployee({ fname, lname, email, role, hashedPassword });
 
         const token = generateToken(userId, role);

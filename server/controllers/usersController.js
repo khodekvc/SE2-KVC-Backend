@@ -1,6 +1,7 @@
 const UserModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const { authenticate } = require("../middleware/authMiddleware");
+const { hashPassword, comparePassword } = require("../utils/passwordUtility");
 
 // Update employee profile
 exports.updateEmployeeProfile = [
@@ -80,14 +81,14 @@ exports.changePassword = [
             }
 
             // Compare the current password with the stored password
-            const isMatch = await bcrypt.compare(currentPassword, storedPassword);
+            const isMatch = await comparePassword(currentPassword, storedPassword);
 
             if (!isMatch) {
                 return res.status(401).json({ error: "❌ Incorrect current password." });
             }
 
             // Hash the new password
-            const hashedPassword = await UserModel.hashPassword(newPassword);
+            const hashedPassword = await hashPassword(newPassword);
 
             // Update the password in the database
             await UserModel.updatePassword(userId, hashedPassword);

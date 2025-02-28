@@ -1,6 +1,7 @@
 const db = require("../config/db");
 const bcrypt = require("bcrypt");
 
+
 class UserModel {
     static async getUserById(userId) {
         const [rows] = await db.execute("SELECT * FROM users WHERE user_id = ?", [userId]);
@@ -64,10 +65,6 @@ class UserModel {
             "UPDATE owner SET owner_address = ?, owner_alt_person1 = ?, owner_alt_contact1 = ? WHERE user_id = ?",
             [address, altperson, altcontact, userId]
         );
-    }
-
-    static async hashPassword(password) {
-        return bcrypt.hash(password, 10);
     }
 }
 
