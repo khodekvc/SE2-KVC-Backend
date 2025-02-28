@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from 'react';
+import { useState } from "react";
 import Navbar from '../components/Navbar';
 import { Button } from '../components/Button';
 import FormGroup from '../components/FormGroup';
@@ -6,89 +7,23 @@ import "../css/Forms.css";
 
 const SignupEmployee = () => {
   const [formData, setFormData] = useState({
-    firstname: "",
-    lastname: "",
+    fname: "",
+    lname: "",
     email: "",
     contact: "",
     role: "",
     password: "",
     confirmPassword: "",
-    captchaInput: "",
+    captcha: "",
   });
-
-  const [captchaImage, setCaptchaImage] = useState("");
-  const [captchaKey, setCaptchaKey] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    fetchCaptcha();
-  }, []);
-
-  const fetchCaptcha = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/auth/captcha", {
-        method: "GET",
-        credentials: "include",
-      });
-      if (response.ok) {
-        const data = await response.json();
-
-        console.log("Fetched CAPTCHA Data:", data);
-
-        setCaptchaImage(data.image);
-        setCaptchaKey(data.captchaText);
-
-      } else {
-        console.error("Failed to load CAPTCHA");
-      }
-    } catch (error) {
-      console.error("Error fetching CAPTCHA:", error);
-    }
-  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Signing up employee:", formData);
-    setLoading(true);
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
-      setLoading(false);
-      return;
-    }
-    
-    try {
-      const response = await fetch("http://localhost:5000/auth/signup/employee", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          ...formData,
-          captchaKey,
-          captchaResponse: formData.captchaInput,
-        }),
-      });
-      const data = await response.json();
-
-      console.log("Signup Response:", data);
-
-      if (response.ok) {
-        alert("Employee signup successful!");
-        window.location.href = "/dashboard";
-      } else {
-        setError(data.error || "❌ Signup failed. Please try again.");
-        fetchCaptcha();
-      }
-    } catch (error) {
-      setError("❌ Server error. Please try again later.");
-    }
-    setLoading(false);
   };
 
   return (
@@ -104,17 +39,14 @@ const SignupEmployee = () => {
       </div>
       <div className="right-section">
         <h2>Create Account</h2>
-          <p>Become part of our team!</p>
-          
-          {error && <p className="error-message">{error}</p>}
-
+        <p>Become part of our team!</p>
         <form onSubmit={handleSubmit}>
           <div className="signup-form-row">
             <FormGroup 
               label="First Name" 
               type="text" 
               name="fname" 
-              value={formData.firstname} 
+              value={formData.fname} 
               onChange={handleChange} 
               required 
             />
@@ -122,11 +54,12 @@ const SignupEmployee = () => {
               label="Last Name" 
               type="text" 
               name="lname" 
-              value={formData.lastname} 
+              value={formData.lname} 
               onChange={handleChange} 
               required 
             />
           </div>
+          <div className="signup-form-row">
           <FormGroup 
             label="Email" 
             type="email" 
@@ -135,6 +68,14 @@ const SignupEmployee = () => {
             onChange={handleChange} 
             required 
           />
+           <FormGroup 
+            label="Contact Number" 
+            type="text" 
+            name="contact" 
+            value={formData.contact} 
+            onChange={handleChange}  
+          />
+          </div>
           <div className="radio">
             <label>Choose Role*</label>
             <div className="radio-group">
