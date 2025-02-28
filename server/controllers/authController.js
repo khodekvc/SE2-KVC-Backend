@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 
 const UserModel = require("../models/userModel");
+const PetModel = require("../models/petModel");
 const { generateCaptcha, generateCaptchaImage } = require("../utils/captchaUtility");
 const { generateToken } = require("../utils/authUtility");
 const { sendEmail } = require("../utils/emailUtility");
@@ -88,7 +89,7 @@ exports.signupPetOwnerStep2 = async (req, res) => {
 
     try {
         const userId = await UserModel.createPetOwner({ fname, lname, email, contact, address, password });
-        await UserModel.createPet({ petname, gender, species, breed, birthdate, userId });
+        await PetModel.createPet({ petname, gender, species, breed, birthdate, userId });
 
         const token = generateToken(userId, "owner");
         console.log('Generated Token:', token);

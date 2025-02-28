@@ -39,13 +39,6 @@ class UserModel {
         return userId;
     }
 
-    static async createPet({ petname, gender, species, breed, birthdate, userId }) {
-        return db.query(
-            "INSERT INTO pet_info (pet_name, pet_gender, pet_species, pet_breed, pet_birthday, pet_vitality, pet_status, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [petname, gender, species, breed, birthdate, true, true, userId]
-        );
-    }
-
     static async createEmployee({ fname, lname, email, role, hashedPassword }) {
         const [result] = await db.execute(
             "INSERT INTO users (user_email, user_password, user_firstname, user_lastname, user_role) VALUES (?, ?, ?, ?, ?)",

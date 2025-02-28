@@ -10,7 +10,6 @@ const bodyParser = require("body-parser");
 // database and route handler imports
 const db = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
-const dbTestRoutes = require("./routes/dbTestRoutes");
 const usersRoutes = require("./routes/usersRoutes");
 const petRoutes = require("./routes/petRoutes");
 const { authenticate, authorize } = require("./middleware/authMiddleware");
@@ -71,7 +70,6 @@ app.get("/protected-route", authenticate, (req, res) => {
 
 // route handlers
 app.use("/auth", authRoutes);
-app.use("/db-test", dbTestRoutes);
 app.use("/user", usersRoutes);
 app.use("/api/pets", petRoutes);
 

@@ -6,6 +6,13 @@ class PetModel {
         return result.length ? result[0] : null;
     }
 
+    static async createPet({ petname, gender, species, breed, birthdate, userId }) {
+        return db.query(
+            "INSERT INTO pet_info (pet_name, pet_gender, pet_species, pet_breed, pet_birthday, pet_vitality, pet_status, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [petname, gender, species, breed, birthdate, true, true, userId]
+        );
+    }
+
     static async updatePet(pet_id, pet_name, pet_species, pet_breed, pet_gender, pet_birthday, pet_color, pet_status) {
         const [result] = await db.execute(
             `UPDATE pet_info 
