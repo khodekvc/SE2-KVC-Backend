@@ -38,3 +38,57 @@ exports.updatePetProfile = [// Check if the user is a doctor or clinician
         }
     }
 ];
+
+exports.archivePet = async (req, res) => {
+    const { pet_id } = req.params;
+
+    try {
+        const pet = await PetModel.findById(pet_id);
+        if (!pet) {
+            return res.status(404).json({ error: "❌ Pet not found!" });
+        }
+
+        await PetModel.archivePet(pet_id);
+        res.json({ message: `✅ Pet ${pet.pet_name} archived successfully!` });
+    } catch (error) {
+        console.error("Archive Pet Error:", error);
+        res.status(500).json({ error: "❌ Server error during archiving pet." });
+    }
+};
+
+exports.restorePet = async (req, res) => {
+    const { pet_id } = req.params;
+
+    try {
+        const pet = await PetModel.findById(pet_id);
+        if (!pet) {
+            return res.status(404).json({ error: "❌ Pet not found!" });
+        }
+
+        await PetModel.restorePet(pet_id);
+        res.json({ message: `✅ Pet ${pet.pet_name} restored successfully!` });
+    } catch (error) {
+        console.error("Restore Pet Error:", error);
+        res.status(500).json({ error: "❌ Server error during restoring pet." });
+    }
+};
+
+exports.getAllActivePets = async (req, res) => {
+    try {
+        // Fetch active pets where pet_status is "active"
+        const activePets = await Pet.find({ pet_status: "active" });
+        res.status(200).json(activePets);
+    } catch (error) {
+        res.status(500).json({ error: "❌ Error fetching active pets." });
+    }
+};
+
+exports.getAllArchivedPets = async (req, res) => {
+    try {
+        // Fetch archived pets where pet_status is "archived"
+        const archivedPets = await Pet.find({ pet_status: "archived" });
+        res.status(200).json(archivedPets);
+    } catch (error) {
+        res.status(500).json({ error: "❌ Error fetching archived pets." });
+    }
+};

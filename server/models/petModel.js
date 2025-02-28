@@ -22,6 +22,24 @@ class PetModel {
         );
         return result;
     }
+
+    static async archivePet(pet_id) {
+        return db.execute("UPDATE pet_info SET pet_status = 0 WHERE pet_id = ?", [pet_id]);
+    }
+
+    static async restorePet(pet_id) {
+        return db.execute("UPDATE pet_info SET pet_status = 1 WHERE pet_id = ?", [pet_id]);
+    }
+
+    static async getAllActivePets() {
+        const [result] = await db.execute("SELECT * FROM pet_info WHERE pet_status = 1");
+        return result;
+    }
+
+    static async getAllArchivedPets() {
+        const [result] = await db.execute("SELECT * FROM pet_info WHERE pet_status = 0");
+        return result;
+    }
 }
 
 module.exports = PetModel;
