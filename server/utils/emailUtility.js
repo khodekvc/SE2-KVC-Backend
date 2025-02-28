@@ -1,13 +1,13 @@
 const nodemailer = require("nodemailer");
-require("dotenv").config(); // Load environment variables
+require("dotenv").config();
 
 const sendEmail = async (to, subject, body) => {
     try {
         let transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: process.env.EMAIL_USER, // Gmail email
-                pass: process.env.EMAIL_PASS, // App password (not your actual password)
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS, 
             },
         });
 

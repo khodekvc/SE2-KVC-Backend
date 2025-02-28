@@ -21,7 +21,6 @@ function generateCaptchaImage(text) {
     ctx.fillStyle = "#000";
     ctx.fillText(text, 25, 35);
 
-        // Convert to Base64
     return canvas.toDataURL();
 }
 
