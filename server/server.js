@@ -33,7 +33,7 @@ app.use(session({
 
 app.use(express.json());
 app.use(cors({
-    origin: ["http://localhost:5173"], 
+    origin: ["http://localhost:5173" || "http://localhost:5174"], 
     credentials: true
 }));
 app.use(express.urlencoded({ extended: true })); 
@@ -71,7 +71,7 @@ app.get("/protected-route", authenticate, (req, res) => {
 // route handlers
 app.use("/auth", authRoutes);
 app.use("/user", usersRoutes);
-app.use("/api/pets", petRoutes);
+app.use("/pets", petRoutes);
 
 // starts the server
 app.listen(port, () => {

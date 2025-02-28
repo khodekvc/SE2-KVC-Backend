@@ -1,8 +1,36 @@
 import { Menu, LogOut } from "lucide-react";
 import "../css/Header.css";
-import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const Header = ({ toggleSidebar }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+        const csrfToken = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("csrfToken="))
+            ?.split("=")[1];
+
+        const response = await fetch("http://localhost:5000/auth/logout", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "X-CSRF-Token": csrfToken // Send CSRF token in headers
+            }
+        });
+
+        if (response.ok) {
+            navigate("/");
+        } else {
+            console.error("Logout failed");
+        }
+    } catch (error) {
+        console.error("Error during logout:", error);
+    }
+  };
+
+
   return (
     <header className="header">
       <div className="header-left">
@@ -17,12 +45,10 @@ const Header = ({ toggleSidebar }) => {
           <p>Four paws, two feet, one heart</p>
         </div>
       </div>
-      <Link to="/" className="logout-link">
-      <button className="logout-btn">
+      <button className="logout-btn" onClick={handleLogout}>
         <span className="logout-text">LOG OUT</span>
         <LogOut size={24} className="logout-icon" />
       </button>
-      </Link>
     </header>
   );
 };

@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from "../components/Navbar";
-import { useState } from "react";
 import { Button } from '../components/Button';
 import FormGroup from '../components/FormGroup';
 import "../css/Forms.css"
@@ -10,12 +9,63 @@ function LoginForm() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    captcha: "",
+    captchaInput: "",
   });
+  const [captcha, setCaptcha] = useState({ image: "", captchaKey: "" });
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
+
+  const fetchCaptcha = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/auth/captcha", {
+        credentials: "include", // Ensure session persistence
+      });
+      const data = await response.json();
+      console.log("CAPTCHA loaded:", data);  
+      setCaptcha({ image: data.image, captchaKey: data.captchaKey });
+    } catch (error) {
+      console.error("Failed to load CAPTCHA:", error);
+    }
+  };
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Form Submitted");
+
+  try {
+    const csrfToken = document.cookie
+      .split("; ")
+      .find(row => row.startsWith("csrfToken="))
+      ?.split("=")[1];
+    console.log(csrfToken);
+
+    const response = await fetch("http://localhost:5000/auth/login", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Login failed");
+
+    setMessage(data.message);
+    window.location.replace(data.redirectUrl);
+  } catch (error) {
+    setMessage(error.message);
+  }
+};
 
   return (
     <>
@@ -27,7 +77,7 @@ function LoginForm() {
       <div className="right-section">
         <h2>Welcome Back!</h2>
         <p>Login to your account</p>
-        <form>
+        <form onSubmit={handleSubmit}>
           <FormGroup 
             label="Email" 
             type="email" 
@@ -50,18 +100,18 @@ function LoginForm() {
           <div className="forms-group captcha">
             <label htmlFor="captcha">Enter Captcha</label>
             <div className="captcha-container">
-              <img className="generated" alt="CAPTCHA" />
+              <img src={`${captcha.image}`} className="generated" alt="CAPTCHA" />
               <input 
                 type="text" 
                 id="captcha" 
-                name="captcha" 
-                value={formData.captcha} 
+                name="captchaInput" 
+                value={formData.captchaInput} 
                 onChange={handleChange} 
                 required 
               />
             </div>
           </div>
-          <Button buttonStyle='btn--primary' to='/patients' className="form-btn-1">LOGIN</Button>
+          <Button buttonStyle='btn--primary' type="submit" className="form-btn-1">LOGIN</Button>
         </form>
       </div>
     </div>

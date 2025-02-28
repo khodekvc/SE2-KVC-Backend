@@ -27,13 +27,13 @@ exports.loginUser = async (req, res) => {
         req.session.captcha = null;
 
         const user = await UserModel.findByEmail(email);
-        console.log('User:', user);
         if (!user || !(await bcrypt.compare(password, user.user_password))) {
             return res.status(401).json({ error: "Invalid email or password" });
         }
 
         const token = generateToken(user.user_id, user.user_role);
-        console.log('Generated Token:', token);
+        const csrfToken = crypto.randomBytes(32).toString("hex");
+
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
@@ -41,7 +41,19 @@ exports.loginUser = async (req, res) => {
             maxAge: 15 * 60 * 1000
         });
 
-        res.json({ message: "✅ Login successful!" });
+        res.cookie("csrfToken", csrfToken, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 15 * 60 * 1000
+        });
+
+        res.json({
+            message: "✅ Login successful!",
+            csrfToken,
+            redirectUrl: "/patients",
+        });
+
     } catch (error) {
         console.error("Login Error:", error);
         res.status(500).json({ error: "❌ Server error during login" });
@@ -195,10 +207,15 @@ exports.signupEmployeeComplete = async (req, res) => {
 // user logout
 exports.logoutUser = (req, res) => {
     try {
-        // Clear the token from the client (usually from the cookies)
-        res.clearCookie("token");
+        req.session.destroy((err) => {
+            if (err) {
+            return res.status(500).json({ message: "Logout failed" });
+            }
 
-        return res.json({ message: "✅ Logout successful!" });
+            // Remove session cookie from browser
+            res.clearCookie("connect.sid", { path: "/" });
+            return res.json({ message: "Logout successful" });
+        })
     } catch (error) {
         console.error("Logout Error:", error);
         return res.status(500).json({ error: "❌ Server error during logout" });
