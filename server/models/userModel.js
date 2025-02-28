@@ -67,10 +67,9 @@ class UserModel {
             [firstname, lastname, email, contact, userId]
         );
 
-        // Update owner-specific details
         await db.execute(
             "UPDATE owner SET owner_address = ?, owner_alt_person1 = ?, owner_alt_contact1 = ? WHERE user_id = ?",
-            [address, altperson, altontact, userId]
+            [address, altperson, altcontact, userId]
         );
     }
 

@@ -2,12 +2,12 @@ const UserModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const { authenticate } = require("../middleware/authMiddleware");
 
-// Update employee profile (firstname, lastname, email, contact)
+// Update employee profile
 exports.updateEmployeeProfile = [
-    authenticate, // Middleware to authenticate user
+    authenticate,
     async (req, res) => {
         const { firstname, lastname, email, contact } = req.body;
-        const userId = req.user.userId; // Get user ID from session
+        const userId = req.user.userId;
 
         console.log("Request Body:", req.body);
         console.log("User ID from JWT:", userId);
@@ -30,10 +30,10 @@ exports.updateEmployeeProfile = [
 
 // Update pet owner profile
 exports.updateOwnerProfile = [
-    authenticate, // Middleware to authenticate user
+    authenticate,
     async (req, res) => {
         const { firstname, lastname, email, contact, address, altperson, altcontact } = req.body;
-        const userId = req.user.userId; // Get user ID from session
+        const userId = req.user.userId;
 
         console.log("Request Body:", req.body);
         console.log("User ID from JWT:", userId);
@@ -43,7 +43,6 @@ exports.updateOwnerProfile = [
         }
 
         try {
-            // Update user profile
             await UserModel.updateOwnerProfile(userId, firstname, lastname, email, contact, address, altperson, altcontact);
 
             res.json({ message: "✅ Pet owner profile updated successfully!" });
@@ -54,12 +53,11 @@ exports.updateOwnerProfile = [
     }
 ];
 
-// Change password
 exports.changePassword = [
     authenticate,
     async (req, res) => {
         const { currentPassword, newPassword, confirmNewPassword } = req.body;
-        const userId = req.user.userId; // Get user ID from session
+        const userId = req.user.userId;
 
         if (!userId) {
             return res.status(401).json({ error: "❌ Unauthorized. Please log in." });
