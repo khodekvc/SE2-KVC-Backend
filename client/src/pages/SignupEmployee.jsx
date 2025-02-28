@@ -4,7 +4,7 @@ import { Button } from '../components/Button';
 import FormGroup from '../components/FormGroup';
 import "../css/Forms.css";
 
-const SignupEmployee = ({ captcha, setCaptcha }) => {
+const SignupEmployee = () => {
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -177,22 +177,13 @@ const SignupEmployee = ({ captcha, setCaptcha }) => {
           <div className="forms-group captcha">
             <label htmlFor="captcha">Enter Captcha</label>
             <div className="captcha-container">
-              {captchaImage ? (
-                <img
-                  className="generated"
-                  src={captchaImage.startsWith("data:image") ? captchaImage : `data:image/png;base64,${captchaImage}`}
-                  alt="CAPTCHA verification"
-                  id="captchaImage"
-                />
-              ) : (
-                <p>Loading...</p> // ✅ Fallback text while loading
-              )}
+              <img className="generated" src="LoginServlet" alt="CAPTCHA" id="captchaImage" />
               <input 
                 type="text" 
                 id="captcha" 
                 name="captcha" 
                 value={formData.captcha} 
-                onChange={(e) => setCaptcha(e.target.value)} 
+                onChange={handleChange} 
                 required 
               />
             </div>

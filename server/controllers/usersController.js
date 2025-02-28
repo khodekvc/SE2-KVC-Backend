@@ -1,91 +1,103 @@
-const db = require("../config/db");
+const UserModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const { authenticate } = require("../middleware/authMiddleware");
 
-// Update user profile (firstname, lastname, email, contact)
-exports.updateProfile = async (req, res) => {
-    const { firstname, lastname, email, contact } = req.body;
-    const userId = req.session.user?.id; // Get user ID from session
+// Update employee profile (firstname, lastname, email, contact)
+exports.updateEmployeeProfile = [
+    authenticate, // Middleware to authenticate user
+    async (req, res) => {
+        const { firstname, lastname, email, contact } = req.body;
+        const userId = req.user.userId; // Get user ID from session
 
-    if (!userId) {
-        return res.status(401).json({ error: "❌ Unauthorized. Please log in." });
-    }
+        console.log("Request Body:", req.body);
+        console.log("User ID from JWT:", userId);
 
-    // Validate inputs (ensure no NULL values)
-    if (!firstname || !lastname || !email || !contact) {
-        return res.status(400).json({ error: "❌ All fields are required!" });
-    }
-
-    try {
-        // Check if the email is already taken by another user
-        const [existingUser] = await db.execute(
-            "SELECT user_id FROM users WHERE user_email = ? AND user_id != ?",
-            [email, userId]
-        );
-        
-        if (existingUser.length > 0) {
-            return res.status(400).json({ error: "❌ Email already in use by another account." });
+        if (!firstname || !lastname || !email) {
+            return res.status(400).json({ error: "❌ All fields are required!" });
         }
 
-        // Update user details
-        await db.execute(
-            "UPDATE users SET user_firstname = ?, user_lastname = ?, user_email = ?, user_contact = ? WHERE user_id = ?",
-            [firstname, lastname, email, contact, userId]
-        );
+        try {
+            // Update user profile
+            await UserModel.updateEmployeeProfile(userId, firstname, lastname, email, contact);
 
-        res.json({ message: "✅ Profile updated successfully!" });
-
-    } catch (error) {
-        console.error("Profile Update Error:", error);
-        res.status(500).json({ error: "❌ Server error while updating profile." });
+            res.json({ message: "✅ Employee profile updated successfully!" });
+        } catch (error) {
+            console.error("Profile Update Error:", error);
+            res.status(500).json({ error: "❌ Server error while updating profile." });
+        }
     }
-};
+];
+
+// Update pet owner profile
+exports.updateOwnerProfile = [
+    authenticate, // Middleware to authenticate user
+    async (req, res) => {
+        const { firstname, lastname, email, contact, address, altperson, altcontact } = req.body;
+        const userId = req.user.userId; // Get user ID from session
+
+        console.log("Request Body:", req.body);
+        console.log("User ID from JWT:", userId);
+
+        if (!firstname || !lastname || !email) {
+            return res.status(400).json({ error: "❌ All fields are required!" });
+        }
+
+        try {
+            // Update user profile
+            await UserModel.updateOwnerProfile(userId, firstname, lastname, email, contact, address, altperson, altcontact);
+
+            res.json({ message: "✅ Pet owner profile updated successfully!" });
+        } catch (error) {
+            console.error("Profile Update Error:", error);
+            res.status(500).json({ error: "❌ Server error while updating profile." });
+        }
+    }
+];
 
 // Change password
-exports.changePassword = async (req, res) => {
-    const { currentPassword, newPassword, confirmNewPassword } = req.body;
-    const userId = req.session.user?.id; // Get user ID from session
+exports.changePassword = [
+    authenticate,
+    async (req, res) => {
+        const { currentPassword, newPassword, confirmNewPassword } = req.body;
+        const userId = req.user.userId; // Get user ID from session
 
-    if (!userId) {
-        return res.status(401).json({ error: "❌ Unauthorized. Please log in." });
-    }
-
-    if (!currentPassword || !newPassword || !confirmNewPassword) {
-        return res.status(400).json({ error: "❌ All fields are required!" });
-    }
-
-    if (newPassword.trim() === "" || confirmNewPassword.trim() === "") {
-        return res.status(400).json({ error: "❌ Password cannot be empty!" });
-    }
-
-    if (newPassword !== confirmNewPassword) {
-        return res.status(400).json({ error: "❌ New passwords do not match!" });
-    }
-
-    try {
-        // Fetch the user's current hashed password
-        const [user] = await db.execute("SELECT user_password FROM users WHERE user_id = ?", [userId]);
-
-        if (user.length === 0) {
-            return res.status(404).json({ error: "❌ User not found." });
+        if (!userId) {
+            return res.status(401).json({ error: "❌ Unauthorized. Please log in." });
         }
 
-        // Compare the current password with the hashed password in the database
-        const isMatch = await bcrypt.compare(currentPassword, user[0].user_password);
-
-        if (!isMatch) {
-            return res.status(401).json({ error: "❌ Incorrect current password." });
+        if (!currentPassword || !newPassword || !confirmNewPassword) {
+            return res.status(400).json({ error: "❌ All fields are required!" });
         }
 
-        // Hash the new password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({ error: "❌ New passwords do not match!" });
+        }
 
-        // Update the password in the database
-        await db.execute("UPDATE users SET user_password = ? WHERE user_id = ?", [hashedPassword, userId]);
+        try {
+            // Fetch the user's current hashed password
+            const storedPassword = await UserModel.getPasswordById(userId);
 
-        res.json({ message: "✅ Password changed successfully!" });
+            if (!storedPassword) {
+                return res.status(404).json({ error: "❌ User not found." });
+            }
 
-    } catch (error) {
-        console.error("Password Change Error:", error);
-        res.status(500).json({ error: "❌ Server error while changing password." });
+            // Compare the current password with the stored password
+            const isMatch = await bcrypt.compare(currentPassword, storedPassword);
+
+            if (!isMatch) {
+                return res.status(401).json({ error: "❌ Incorrect current password." });
+            }
+
+            // Hash the new password
+            const hashedPassword = await UserModel.hashPassword(newPassword);
+
+            // Update the password in the database
+            await UserModel.updatePassword(userId, hashedPassword);
+
+            res.json({ message: "✅ Password changed successfully!" });
+        } catch (error) {
+            console.error("Password Change Error:", error);
+            res.status(500).json({ error: "❌ Server error while changing password." });
+        }
     }
-};
+];

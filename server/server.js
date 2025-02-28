@@ -13,9 +13,7 @@ const authRoutes = require("./routes/authRoutes");
 const dbTestRoutes = require("./routes/dbTestRoutes");
 const usersRoutes = require("./routes/usersRoutes");
 const petRoutes = require("./routes/petRoutes");
-
-
-
+const { authenticate, authorize } = require("./middleware/authMiddleware");
 
 // express app initializer
 const app = express();
@@ -65,6 +63,11 @@ app.get("/check-session", (req, res) => {
 app.get('/session-data', (req, res) => {
     res.json({ formData: req.session.formData || {} });
 });
+
+app.get("/protected-route", authenticate, (req, res) => {
+    res.json({ message: "✅ Access granted!", user: req.user });
+});
+
 
 // route handlers
 app.use("/auth", authRoutes);
