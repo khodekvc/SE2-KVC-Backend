@@ -59,6 +59,7 @@ const SignupEmployee = () => {
               required 
             />
           </div>
+          <div className="signup-form-row">
           <FormGroup 
             label="Email" 
             type="email" 
@@ -67,6 +68,14 @@ const SignupEmployee = () => {
             onChange={handleChange} 
             required 
           />
+           <FormGroup 
+            label="Contact Number" 
+            type="text" 
+            name="contact" 
+            value={formData.contact} 
+            onChange={handleChange}  
+          />
+          </div>
           <div className="radio">
             <label>Choose Role*</label>
             <div className="radio-group">
