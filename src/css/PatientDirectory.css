@@ -19,7 +19,7 @@
   
 
   .directory-header h2 {
-    color: #FF7F11;
+    color: var(--orange-color);
     font-size: 2rem;
     margin-bottom: 1rem;
     text-align: center;
@@ -51,7 +51,7 @@
   
   .search-input:focus {
     outline: none;
-    border-color: #FF7F11 !important;;
+    border-color: var(--orange-color) !important;;
   }
   
   .filter-button {
@@ -61,7 +61,7 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #FF7F11;
+    color: var(--orange-color);
     cursor: pointer;
     padding: 0.5rem;
     display: flex;
@@ -70,7 +70,7 @@
   }
   
   .filter-button:hover {
-    color: #ff6b00;
+    color: var(--blue-color);
   }
   
   .table-wrapper {
@@ -97,7 +97,7 @@
   thead {
     position: sticky;
     top: 0;
-    background-color: #FFFEF1;
+    background-color: var(--lyellow-color);
     z-index: 1;
   }
   
@@ -133,7 +133,7 @@
   }
   
   .actions svg:hover {
-    color: #FF7F11;
+    color: var(--blue-color);
   }
   
 
@@ -179,7 +179,7 @@
   }
 
   th {
-    background-color: #fffef1;
+    background-color: var(--lyellow-color);
   }
 
   tbody {
@@ -205,12 +205,9 @@
     font-size: 0.9rem;
   }
 
-
-    
   }
 
 
-  
   @media (max-width: 480px) {
     .directory-header {
       position: fixed;
@@ -222,9 +219,6 @@
       margin-top: 8rem;
     }
 
-
-
-   
   }
 
   

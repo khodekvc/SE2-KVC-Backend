@@ -18,13 +18,13 @@
   }
   
   .add-pet-header h1 {
-    color: #ff6b00;
+    color: var(--orange-color);
     font-size: 2rem;
     margin-bottom: 0.5rem;
   }
   
   .add-pet-header p {
-    color: #ff6b00;
+    color: var(--orange-color);
     font-size: 1.1rem;
   }
   
@@ -36,7 +36,7 @@
   }
   
   .form-section-header {
-    background: #ff6b00;
+    background: var(--orange-color);
     padding: 1rem;
     border-radius: 1rem 1rem 0 0;
   }
@@ -81,7 +81,7 @@
   .form-field input[type="date"]:focus,
   .form-field select:focus {
     outline: none;
-    border-color: #ff6b00;
+    border-color: var(--orange-color);
   }
   
   .radio-group {
@@ -121,7 +121,7 @@
   }
   
   .add-pet-btn {
-    background-color: #ff6b00;
+    background-color: var(--orange-color);
     color: white;
     border: none;
     padding: 0.75rem 3rem;
@@ -132,7 +132,7 @@
   }
   
   .add-pet-btn:hover {
-    background-color: #e65c00;
+    background-color: var(--blue-color);
   }
   
   @media (max-width: 768px) {

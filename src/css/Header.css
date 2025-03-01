@@ -39,7 +39,7 @@ header {
   }
   
   .header-text h1 {
-    color: #ff6b00;
+    color: var(--orange-color);
     font-size: 1.5rem;
     margin: 0;
   }
@@ -52,9 +52,9 @@ header {
   
   .logout-btn {
     background-color: white;
-    border: 2px solid #ff6b00;
+    border: 2px solid var(--orange-color);
     border-radius: 25px;
-    color: #ff6b00;
+    color: var(--orange-color);
     padding: 0.5rem 2rem;
     font-weight: bold;
     cursor: pointer;
@@ -65,7 +65,7 @@ header {
   }
 
   .logout-btn:hover {
-    background-color: #ff6b00;
+    background-color: var(--orange-color);
     color: white;
   }
   
@@ -81,7 +81,7 @@ header {
     display: none;
     background: none;
     border: none;
-    color: #ff6b00;
+    color: var(--orange-color);
     cursor: pointer;
     padding: 0.5rem;
   }
