@@ -9,6 +9,7 @@ import OwnerSidebar from "./components/OwnerSidebar";
 import PatientDirectory from "./pages/PatientDirectory";
 import PetProfile from "./pages/PetProfile";
 import MyAccount from "./pages/MyAccount";
+import OwnerMyAccount from "./pages/OwnerMyAccount";
 import AddNewPet from "./pages/AddNewPet";
 import LoginForm from "./pages/LoginForm";
 import SignupPetOwner from "./pages/SignupPetOwner";
@@ -59,7 +60,8 @@ function App() {
                       <Routes>
                         <Route path="/patients" element={<PatientDirectory />} />
                         <Route path="/PetProfile/:id" element={<PetProfile />} />
-                        <Route path="/account" element={<MyAccount />} />
+                        // change to MyAccount for Clinicians/Doc/Front, OwnerMyAccount for Pet Owner page
+                        <Route path="/account" element={<MyAccount />} />  
                         <Route path="/add-pet" element={<AddNewPet />} />
                       </Routes>
                     </div>

@@ -35,7 +35,7 @@
   .back-button {
     background: none;
     border: none;
-    color: #ff6b00;
+    color: var(--orange-color);
     cursor: pointer;
     padding: 0.5rem;
     display: flex;
@@ -44,7 +44,7 @@
   }
   
   .header-left span {
-    color: #ff6b00;
+    color: var(--orange-color);
     font-size: 1.2rem;
   }
   
@@ -53,7 +53,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: #ff6b00;
+    background-color: var(--orange-color);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -65,7 +65,7 @@
   
   .update-button:hover,
   .save-button:hover {
-    background-color: #e65c00;
+    background-color: var(--blue-color);
   }
   
   .record-content {

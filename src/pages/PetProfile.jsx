@@ -1,9 +1,10 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Pencil, Plus, Save } from "lucide-react"
 import "../css/PetProfile.css"
 import VisitHistory from "./VisitHistory"
 import { useConfirmDialog } from "../contexts/ConfirmDialogContext"
+import { calculateAge } from "../components/DateCalculator"
 
 export default function PetProfile() {
   const { showConfirmDialog } = useConfirmDialog()
@@ -17,7 +18,7 @@ export default function PetProfile() {
     species: "Dog",
     breed: "Dalmatian",
     gender: "Female",
-    birthday: "05/06/2021",
+    birthday: "2021-05-06", 
     age: {
       years: "03",
       months: "07",
@@ -35,7 +36,6 @@ export default function PetProfile() {
     { type: "Bordatella", doses: 1, date: "10/15/2024" },
     { type: "DHLPP", doses: 1, date: "9/30/2024" },
   ])
-
 
   const [vaccineType, setVaccineType] = useState("")
   const [doses, setDoses] = useState("")
@@ -77,15 +77,29 @@ export default function PetProfile() {
 
   const handleSave = () => {
     showConfirmDialog("Do you want to save your changes?", () => {
-    setPetData(editedPetData)
-    setIsEditing(false)
-  })
-}
+      const newAge = calculateAge(editedPetData.birthday)
+      const updatedPetData = { ...editedPetData, age: newAge }
+      setPetData(updatedPetData)
+      setIsEditing(false)
+    })
+  }
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setEditedPetData((prev) => ({ ...prev, [name]: value }))
+    const { name, value, type } = e.target
+    setEditedPetData((prev) => {
+      const updatedData = { ...prev, [name]: type === "radio" ? e.target.id : value }
+      if (name === "birthday") {
+        const newAge = calculateAge(value)
+        updatedData.age = newAge
+      }
+      return updatedData
+    })
   }
+
+  useEffect(() => {
+    const age = calculateAge(petData.birthday)
+    setPetData((prevData) => ({ ...prevData, age }))
+  }, [petData.birthday]) 
 
   return (
     <div className="pet-profile-page">
@@ -132,12 +146,11 @@ export default function PetProfile() {
                 <div className="detail-item">
                   <label>Species</label>
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="species"
-                      value={editedPetData.species || ""}
-                      onChange={handleInputChange}
-                    />
+                    <select name="species" value={editedPetData.species || ""} onChange={handleInputChange}>
+                    <option value="Dog">Dog</option>
+                    <option value="Cat">Cat</option>
+                    <option value="Turtle">Turtle</option>
+                  </select>
                   ) : (
                     <span>{petData.species}</span>
                   )}
@@ -153,7 +166,28 @@ export default function PetProfile() {
                 <div className="detail-item">
                   <label>Gender</label>
                   {isEditing ? (
-                    <input type="text" name="gender" value={editedPetData.gender || ""} onChange={handleInputChange} />
+                    <div className="radio-group">
+                    <label>
+                      <input
+                        type="radio"
+                        name="gender"
+                        id="Male"
+                        checked={editedPetData.gender === "Male"}
+                        onChange={handleInputChange}
+                      />
+                      Male
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="gender"
+                        id="Female"
+                        checked={editedPetData.gender === "Female"}
+                        onChange={handleInputChange}
+                      />
+                      Female
+                    </label>
+                  </div>
                   ) : (
                     <span>{petData.gender}</span>
                   )}
@@ -168,16 +202,16 @@ export default function PetProfile() {
                       onChange={handleInputChange}
                     />
                   ) : (
-                    <span>{petData.birthday}</span>
+                    <span>{new Date(petData.birthday).toLocaleDateString()}</span>
                   )}
                 </div>
                 <div className="detail-item">
                   <label>Age</label>
                   <span>
                     <span className="age-unit">Years</span>
-                    <span className="age-value">{petData.age.years}</span>
+                    <span className="age-value">{isEditing ? editedPetData.age.years : petData.age.years}</span>
                     <span className="age-unit">Months</span>
-                    <span className="age-value">{petData.age.months}</span>
+                    <span className="age-value">{isEditing ? editedPetData.age.months : petData.age.months}</span>
                   </span>
                 </div>
                 <div className="detail-item">
@@ -191,7 +225,28 @@ export default function PetProfile() {
                 <div className="detail-item">
                   <label>Status</label>
                   {isEditing ? (
-                    <input type="text" name="status" value={editedPetData.status || ""} onChange={handleInputChange} />
+                    <div className="radio-group">
+                    <label>
+                      <input
+                        type="radio"
+                        name="status"
+                        id="Alive"
+                        checked={editedPetData.status === "Alive"}
+                        onChange={handleInputChange}
+                      />
+                      Alive
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="status"
+                        id="Deceased"
+                        checked={editedPetData.status === "Deceased"}
+                        onChange={handleInputChange}
+                      />
+                      Deceased
+                    </label>
+                  </div>
                   ) : (
                     <span>{petData.status}</span>
                   )}
@@ -253,7 +308,7 @@ export default function PetProfile() {
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
                     />
-                  
+                    {/* <Calendar size={16} /> */}
                   </div>
                 </div>
                 <button className="add-button" onClick={handleAddVaccination}>
@@ -268,8 +323,8 @@ export default function PetProfile() {
                     <tr>
                       <th>Type of Vaccine</th>
                       <th>Doses (Qty.)</th>
-                      <th></th>
                       <th>Date</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -277,12 +332,12 @@ export default function PetProfile() {
                       <tr key={index}>
                         <td>{vax.type}</td>
                         <td>{vax.doses}</td>
+                        <td>{vax.date}</td>
                         <td>
                           <button className="add-dose" onClick={() => handleUpdateDose(index)}>
                             +
                           </button>
                         </td>
-                        <td>{vax.date}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -299,3 +354,4 @@ export default function PetProfile() {
     </div>
   )
 }
+
