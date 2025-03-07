@@ -7,18 +7,22 @@ const Header = ({ toggleSidebar }) => {
 
   const handleLogout = async () => {
     try {
-        const csrfToken = document.cookie
-            .split("; ")
-            .find(row => row.startsWith("csrfToken="))
-            ?.split("=")[1];
-
         const response = await fetch("http://localhost:5000/auth/logout", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "X-CSRF-Token": csrfToken // Send CSRF token in headers
-            }
-        });
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Login failed");
+
+    // ✅ Get token from headers or body
+    const token = response.headers.get("Authorization")?.split(" ")[1] || data.token;
+    if (token) {
+      localStorage.setItem("jwt", token);
+    }
 
         if (response.ok) {
             navigate("/");
