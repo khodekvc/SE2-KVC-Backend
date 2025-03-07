@@ -108,7 +108,12 @@ function NavBar() {
             </RouterLink>
           </li>
         </ul>
-        {button && <Button buttonStyle='btn--primary' to='/login'>LOGIN</Button>}
+        {button && (
+          <RouterLink to="/login">
+            <Button buttonStyle="btn--primary">LOGIN</Button>
+          </RouterLink>
+        )}
+
       </div>
     </nav>
   );

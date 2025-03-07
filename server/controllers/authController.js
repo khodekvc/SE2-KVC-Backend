@@ -32,7 +32,7 @@ exports.loginUser = async (req, res) => {
         }
 
         const token = generateToken(user.user_id, user.user_role);
-        const csrfToken = crypto.randomBytes(32).toString("hex");
+        console.log("Generated Token:", token);
 
         res.cookie("token", token, {
             httpOnly: true,
@@ -41,16 +41,8 @@ exports.loginUser = async (req, res) => {
             maxAge: 15 * 60 * 1000
         });
 
-        res.cookie("csrfToken", csrfToken, {
-            httpOnly: false,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "Strict",
-            maxAge: 15 * 60 * 1000
-        });
-
         res.json({
             message: "✅ Login successful!",
-            csrfToken,
             redirectUrl: "/patients",
         });
 
@@ -209,17 +201,20 @@ exports.logoutUser = (req, res) => {
     try {
         req.session.destroy((err) => {
             if (err) {
-            return res.status(500).json({ message: "Logout failed" });
+                return res.status(500).json({ message: "Logout failed" });
             }
 
-            // Remove session cookie from browser
+            // Clear session and authentication cookies
             res.clearCookie("connect.sid", { path: "/" });
+            res.clearCookie("token", { path: "/" });
+
             return res.json({ message: "Logout successful" });
-        })
+        });
     } catch (error) {
         console.error("Logout Error:", error);
         return res.status(500).json({ error: "❌ Server error during logout" });
     }
 };
+
 
 
