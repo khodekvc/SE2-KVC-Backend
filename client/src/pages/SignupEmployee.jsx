@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from "react";
 import Navbar from '../components/Navbar';
+import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
 import FormGroup from '../components/FormGroup';
 import "../css/Forms.css";
@@ -33,7 +34,9 @@ const SignupEmployee = () => {
       <div className="left-section">
         <h1>KHO<br /> VETERINARY<br /> CLINIC</h1>
         <div className="alternate-links">
-          <Button buttonStyle='btn--primary' to='/signup-petowner' className="form-btn-2">Sign up as Pet Owner</Button>
+            <Link to="/signup-petowner">
+            <Button buttonStyle="btn--primary" className="form-btn-2">Sign up as Pet Owner</Button>
+          </Link>
           <p>Not an Employee?</p>
         </div>
       </div>
