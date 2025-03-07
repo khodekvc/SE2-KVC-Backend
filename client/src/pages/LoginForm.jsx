@@ -40,19 +40,12 @@ function LoginForm() {
     e.preventDefault();
     console.log("Form Submitted");
 
-  try {
-    const csrfToken = document.cookie
-      .split("; ")
-      .find(row => row.startsWith("csrfToken="))
-      ?.split("=")[1];
-    console.log(csrfToken);
-
+    try {
     const response = await fetch("http://localhost:5000/auth/login", {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRF-Token": csrfToken,
       },
       body: JSON.stringify(formData),
     });
@@ -60,8 +53,14 @@ function LoginForm() {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Login failed");
 
+    // ✅ Get token from headers or body
+    const token = response.headers.get("Authorization")?.split(" ")[1] || data.token;
+    if (token) {
+      localStorage.setItem("jwt", token);
+    }
+
     setMessage(data.message);
-    window.location.replace(data.redirectUrl);
+    window.location.replace(data.redirectUrl)
   } catch (error) {
     setMessage(error.message);
   }
