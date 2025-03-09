@@ -6,9 +6,11 @@ import AddRecord from "./AddRecord"
 import ViewRecord from "./ViewRecord"
 import FilterModal from "../components/FilterPopup"
 import "../css/VisitHistory.css"
+import { useUserRole } from "../contexts/UserRoleContext"
 
 
 const VisitHistory = () => {
+  const { hasPermission } = useUserRole()
   const [showAddRecord, setShowAddRecord] = useState(false)
   const [selectedRecord, setSelectedRecord] = useState(null)
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
@@ -109,10 +111,12 @@ const VisitHistory = () => {
       </div>
 
       <div className="visit-content">
+      {hasPermission("canAddRecord") && (
         <button className="add-record-btn" onClick={() => setShowAddRecord(true)}>
           <Plus size={20} />
           Add New Record
         </button>
+        )}
 
         <div className="visit-table-container">
           <table className="visit-table">
