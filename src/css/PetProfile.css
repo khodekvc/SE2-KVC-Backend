@@ -151,6 +151,7 @@
   .vaccination-table tr:nth-child(odd) {
     background-color: var(--lblue-color); 
   }
+ 
   .form-group {
     display: flex;
     flex-direction: column;
@@ -163,13 +164,17 @@
     font-weight: bold;
   }
   
-  
-  .form-group input {
+  .form-group input,
+  .form-group select,
+  .form-group .date-input input {
+    width: 100%;
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 0.25rem;
+    font-size: 1rem;
+    background-color: white;
   }
-  
+
   .date-input {
     position: relative;
     display: flex;
@@ -178,8 +183,10 @@
   
   .date-input input {
     width: 100%;
-    padding-right: 2rem;
-  }
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+}
   
   .date-input svg {
     position: absolute;
@@ -214,7 +221,7 @@
   }
   
   .vaccination-table th {
-    text-align: left;
+    text-align: center;
     padding: 1rem;
     color: #666;
     font-weight: 600;

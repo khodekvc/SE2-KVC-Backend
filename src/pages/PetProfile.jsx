@@ -33,10 +33,18 @@ export default function PetProfile() {
     address: "Manila",
   })
 
+    const vaccineTypes = [
+      "3 in 1 (for Cats' 1st Vaccine)",
+      "4 in 1 (for Cats' 2nd and succeeding shots)",
+      "Kennel cough (for Dogs)",
+      "2 in 1 (for Dogs' 1st Vaccine, usually for puppies)",
+      "5 in 1 (for Dogs' 2nd and succeeding shots)",
+      "Anti-rabies (3 months start or succeeding ages)",
+    ]
+
   const [vaccinations, setVaccinations] = useState([
-    { type: "Anti-rabies", doses: 2, date: "11/20/2024" },
-    { type: "Bordatella", doses: 1, date: "10/15/2024" },
-    { type: "DHLPP", doses: 1, date: "9/30/2024" },
+    { type: "2 in 1 (for Dogs' 1st Vaccine, usually for puppies)", doses: 1, date: "11/20/2024" },
+    { type: "4 in 1 (for Cats' 2nd and succeeding shots)", doses: 2, date: "10/15/2024" },
   ])
 
   const [vaccineType, setVaccineType] = useState("")
@@ -48,6 +56,11 @@ export default function PetProfile() {
     const month = String(today.getMonth() + 1).padStart(2, "0")
     const day = String(today.getDate()).padStart(2, "0")
     const year = today.getFullYear()
+    return `${month}/${day}/${year}`
+  }
+
+  const formatDateToMMDDYYYY = (dateString) => {
+    const [year, month, day] = dateString.split("-")
     return `${month}/${day}/${year}`
   }
 
@@ -68,9 +81,8 @@ export default function PetProfile() {
       alert("Please fill in all fields.")
       return
     }
-
-    setVaccinations([...vaccinations, { type: vaccineType, doses: Number(doses), date }])
-
+    const formattedDate = date ? formatDateToMMDDYYYY(date) : ""
+    setVaccinations([...vaccinations, { type: vaccineType, doses: Number(doses), date: formattedDate }])
     setVaccineType("")
     setDoses("")
     setDate("")
@@ -298,13 +310,20 @@ export default function PetProfile() {
                     <label>
                       Type of Vaccine<span className="required">*</span>
                     </label>
-                    <input
-                      type="text"
-                      placeholder="Select vaccine type"
+                    {/* Changed from input to select dropdown */}
+                    <select
                       name="vaccineType"
                       value={vaccineType}
                       onChange={(e) => setVaccineType(e.target.value)}
-                    />
+                      className="vaccine-select"
+                    >
+                      <option value="">Select vaccine type</option>
+                      {vaccineTypes.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="form-group">
                     <label>

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Calendar } from "lucide-react"
 import "../css/AddNewPet.css"
 
 export default function AddNewPet() {
@@ -89,14 +88,15 @@ export default function AddNewPet() {
             </div>
           </div>
 
-          <div className="form-row">
+          <div className="form-row birthday-row">
             <div className="form-field">
               <label>Birthday (Optional)</label>
               <div className="date-input">
                 <input type="date" name="birthday" value={petData.birthday} onChange={handleInputChange} />
-                <Calendar size={20} />
               </div>
             </div>
+            {/*  */}
+            <div className="form-field empty-field"></div>
           </div>
 
           <div className="form-actions">
@@ -109,3 +109,4 @@ export default function AddNewPet() {
     </div>
   )
 }
+
