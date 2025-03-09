@@ -7,8 +7,10 @@ import { useDiagnosisLock } from "../contexts/DiagnosisLockContext"
 import UnlockModal from "../components/UnlockDiagnosisPopup"
 import { useConfirmDialog } from "../contexts/ConfirmDialogContext"
 import MedicalRecordForm from "../components/MedicalRecordForm"
+import { useUserRole } from "../contexts/UserRoleContext"
 
 const ViewRecord = ({ record, onBack, onUpdate }) => {
+  const { hasPermission } = useUserRole()
   const { showConfirmDialog } = useConfirmDialog()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { isDiagnosisLocked, unlockDiagnosis } = useDiagnosisLock()
@@ -69,6 +71,8 @@ const ViewRecord = ({ record, onBack, onUpdate }) => {
             </button>
             <span>Pet's Record for: {editedRecord.date}</span>
           </div>
+          {hasPermission("canUpdateRecord") && (
+            <>
           {isEditing ? (
             <button className="save-button" onClick={handleSave}>
               <Save size={16} />
@@ -79,6 +83,8 @@ const ViewRecord = ({ record, onBack, onUpdate }) => {
               <Pencil size={16} />
               Update
             </button>
+             )}
+            </>
           )}
         </div>
 
@@ -87,7 +93,7 @@ const ViewRecord = ({ record, onBack, onUpdate }) => {
             <MedicalRecordForm
               formData={editedRecord}
               isEditing={isEditing}
-              isDiagnosisLocked={isDiagnosisLocked}
+              isDiagnosisLocked={!hasPermission("canAlwaysEditDiagnosis") && isDiagnosisLocked}
               onInputChange={handleInputChange}
               onUnlockDiagnosis={handleUnlockDiagnosis}
               isAddRecord={false}

@@ -5,8 +5,10 @@ import "../css/PetProfile.css"
 import VisitHistory from "./VisitHistory"
 import { useConfirmDialog } from "../contexts/ConfirmDialogContext"
 import { calculateAge } from "../components/DateCalculator"
+import { useUserRole } from "../contexts/UserRoleContext"
 
 export default function PetProfile() {
+  const { hasPermission } = useUserRole()
   const { showConfirmDialog } = useConfirmDialog()
   const [activeTab, setActiveTab] = useState("profile")
   const [isEditing, setIsEditing] = useState(false)
@@ -50,6 +52,8 @@ export default function PetProfile() {
   }
 
   const handleUpdateDose = (index) => {
+    if (!hasPermission("canAddVaccination")) return
+
     setVaccinations((prevVaccinations) =>
       prevVaccinations.map((vax, i) =>
         i === index ? { ...vax, doses: Number(vax.doses) + 1, date: getCurrentDate() } : vax,
@@ -58,6 +62,8 @@ export default function PetProfile() {
   }
 
   const handleAddVaccination = () => {
+    if (!hasPermission("canAddVaccination")) return
+
     if (!vaccineType || !doses || !date) {
       alert("Please fill in all fields.")
       return
@@ -71,6 +77,8 @@ export default function PetProfile() {
   }
 
   const handleEdit = () => {
+    if (!hasPermission("canEditPetProfile")) return
+
     setIsEditing(true)
     setEditedPetData({ ...petData })
   }
@@ -118,14 +126,15 @@ export default function PetProfile() {
             <div className="pet-details">
               <div className="section-header">
                 <h2>Pet Profile</h2>
-                {isEditing ? (
+                {hasPermission("canEditPetProfile") && !isEditing && (
+                  <button className="edit-button" onClick={handleEdit}>
+                    <Pencil size={16} />
+                  </button>
+                )}
+                {isEditing && (
                   <button className="save-button" onClick={handleSave}>
                     <Save size={16} />
                     Save
-                  </button>
-                ) : (
-                  <button className="edit-button" onClick={handleEdit}>
-                    <Pencil size={16} />
                   </button>
                 )}
               </div>
@@ -253,25 +262,29 @@ export default function PetProfile() {
                 </div>
               </div>
 
-              <h3 className="contact-header">Contact Details</h3>
-              <div className="details-grid">
-                <div className="detail-item">
-                  <label>Owner</label>
-                  <span>{petData.owner}</span>
-                </div>
-                <div className="detail-item">
-                  <label>Email</label>
-                  <span>{petData.email}</span>
-                </div>
-                <div className="detail-item">
-                  <label>Contact no.</label>
-                  <span>{petData.contact}</span>
-                </div>
-                <div className="detail-item">
-                  <label>Address</label>
-                  <span>{petData.address}</span>
-                </div>
-              </div>
+              {hasPermission("canViewContactInfo") && (
+                <>
+                  <h3 className="contact-header">Contact Details</h3>
+                  <div className="details-grid">
+                    <div className="detail-item">
+                      <label>Owner</label>
+                      <span>{petData.owner}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Email</label>
+                      <span>{petData.email}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Contact no.</label>
+                      <span>{petData.contact}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Address</label>
+                      <span>{petData.address}</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="separator"></div>
@@ -279,43 +292,50 @@ export default function PetProfile() {
             <div className="vaccination-record">
               <h2>Vaccination Record</h2>
 
-              <div className="vaccination-form">
-                <div className="form-group">
-                  <label>
-                    Type of Vaccine<span className="required">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Select vaccine type"
-                    name="vaccineType"
-                    value={vaccineType}
-                    onChange={(e) => setVaccineType(e.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>
-                    Doses (Qty.)<span className="required">*</span>
-                  </label>
-                  <input type="number" min="1" name="doses" value={doses} onChange={(e) => setDoses(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label>Date</label>
-                  <div className="date-input">
+              {hasPermission("canAddVaccination") && (
+                <div className="vaccination-form">
+                  <div className="form-group">
+                    <label>
+                      Type of Vaccine<span className="required">*</span>
+                    </label>
                     <input
-                      type="date"
-                      placeholder="Select date"
-                      name="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
+                      type="text"
+                      placeholder="Select vaccine type"
+                      name="vaccineType"
+                      value={vaccineType}
+                      onChange={(e) => setVaccineType(e.target.value)}
                     />
-                    {/* <Calendar size={16} /> */}
                   </div>
+                  <div className="form-group">
+                    <label>
+                      Doses (Qty.)<span className="required">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      name="doses"
+                      value={doses}
+                      onChange={(e) => setDoses(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Date</label>
+                    <div className="date-input">
+                      <input
+                        type="date"
+                        placeholder="Select date"
+                        name="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <button className="add-button" onClick={handleAddVaccination}>
+                    <Plus size={16} />
+                    Add
+                  </button>
                 </div>
-                <button className="add-button" onClick={handleAddVaccination}>
-                  <Plus size={16} />
-                  Add
-                </button>
-              </div>
+              )}
 
               <div className="vaccination-table">
                 <table>
@@ -324,7 +344,7 @@ export default function PetProfile() {
                       <th>Type of Vaccine</th>
                       <th>Doses (Qty.)</th>
                       <th>Date</th>
-                      <th></th>
+                      {hasPermission("canAddVaccination") && <th></th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -333,11 +353,13 @@ export default function PetProfile() {
                         <td>{vax.type}</td>
                         <td>{vax.doses}</td>
                         <td>{vax.date}</td>
-                        <td>
-                          <button className="add-dose" onClick={() => handleUpdateDose(index)}>
-                            +
-                          </button>
-                        </td>
+                        {hasPermission("canAddVaccination") && (
+                          <td>
+                            <button className="add-dose" onClick={() => handleUpdateDose(index)}>
+                              +
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>

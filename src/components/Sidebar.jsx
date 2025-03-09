@@ -1,14 +1,13 @@
+"use client"
+
 import { UserCircle, Folder } from "lucide-react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import "../css/Sidebar.css"
 
 export default function Sidebar({ className = "", onMenuItemClick }) {
   const location = useLocation()
-  const navigate = useNavigate()
-  const isPatientSection = !location.pathname.startsWith("/account")
 
   const handleClick = (path) => {
-    navigate(path)
     if (onMenuItemClick) {
       onMenuItemClick()
     }
@@ -16,35 +15,46 @@ export default function Sidebar({ className = "", onMenuItemClick }) {
 
   return (
     <>
-      {/* desktop didebar */}
+      {/* Desktop Sidebar */}
       <nav className={`sidebar desktop-sidebar ${className}`}>
-        <div
+        <Link
+          to="/account"
           className={`sidebar-item ${location.pathname === "/account" ? "active" : ""}`}
           onClick={() => handleClick("/account")}
         >
           <UserCircle size={40} />
-        </div>
-        <div className={`sidebar-item ${isPatientSection ? "active" : ""}`} onClick={() => handleClick("/")}>
+        </Link>
+        <Link
+          to="/patients"
+          className={`sidebar-item ${location.pathname === "/patients" ? "active" : ""}`}
+          onClick={() => handleClick("/patients")}
+        >
           <Folder size={24} fill="currentColor" />
-        </div>
+        </Link>
       </nav>
 
-      {/* mobile menu */}
+      {/* Mobile Menu */}
       <nav className={`sidebar mobile-sidebar ${className}`}>
         <div className="mobile-menu">
-          <div
+          <Link
+            to="/account"
             className={`mobile-menu-item ${location.pathname === "/account" ? "active" : ""}`}
             onClick={() => handleClick("/account")}
           >
             <UserCircle size={24} />
             <span>My Account</span>
-          </div>
-          <div className={`mobile-menu-item ${isPatientSection ? "active" : ""}`} onClick={() => handleClick("/")}>
+          </Link>
+          <Link
+            to="/patients"
+            className={`mobile-menu-item ${location.pathname === "/patients" ? "active" : ""}`}
+            onClick={() => handleClick("/patients")}
+          >
             <Folder size={24} />
             <span>Patient Directory</span>
-          </div>
+          </Link>
         </div>
       </nav>
     </>
   )
 }
+
