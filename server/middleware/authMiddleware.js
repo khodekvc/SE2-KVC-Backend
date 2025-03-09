@@ -1,6 +1,6 @@
-    const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
-    const authenticate = (req, res, next) => {
+const authenticate = (req, res, next) => {
     if (!process.env.JWT_SECRET) {
         return res.status(500).json({ error: "❌ Server error. Missing JWT_SECRET." });
     }
@@ -20,25 +20,27 @@
         }
 
         req.user = decoded;
+        console.log("Authenticated User:", req.user); // Debugging log
         next();
     });
 };
 
+const authorize = ({ roles = [], userIdParam = "" }) => {
+    return (req, res, next) => {
+        const user = req.user;
+        
+        if (!user) {
+            return res.status(401).json({ error: "❌ Unauthorized: No user found." });
+        }
 
-    const authorize = ({ roles = [], userIdParam = "" }) => {
-        return (req, res, next) => {
-            const user = req.user;
-            
-            if (!user) {
-                return res.status(401).json({ error: "❌ Unauthorized: No user found." });
-            }
+        console.log("User Role:", user.role); // Debugging log
 
-            if (roles.length > 0 && !roles.includes(user.role)) {
-                return res.status(403).json({ error: "❌ Forbidden: You do not have the required role." });
-            }
+        if (roles.length > 0 && !roles.includes(user.role)) {
+            return res.status(403).json({ error: "❌ Forbidden: You do not have the required role." });
+        }
 
-            next();
-        };
+        next();
     };
+};
 
-    module.exports = { authenticate, authorize };
+module.exports = { authenticate, authorize };
