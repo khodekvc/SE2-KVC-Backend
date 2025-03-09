@@ -100,6 +100,25 @@ const PetInfo = () => {
             onChange={handleChange} 
           />
 
+          <div className="signup-form-row">
+          <FormGroup 
+            label="Emergency Contact Person" 
+            type="text" 
+            name="emergencyperson" 
+            value={formData.emergencyperson} 
+            onChange={handleChange} 
+            required
+          />
+          <FormGroup 
+            label="Emergency Contact Number" 
+            type="text" 
+            name="emergencynumber" 
+            value={formData.emergencynumber} 
+            onChange={handleChange}
+            required 
+          />
+          </div>
+
           <div className="forms-group captcha">
             <label htmlFor="captcha">Enter Captcha</label>
             <div className="captcha-container">
