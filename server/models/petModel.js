@@ -13,15 +13,22 @@ class PetModel {
         );
     }
 
-    static async updatePet(pet_id, pet_name, pet_species, pet_breed, pet_gender, pet_birthday, pet_color, pet_status) {
-        const [result] = await db.execute(
-            `UPDATE pet_info 
-            SET pet_name = ?, pet_species = ?, pet_breed = ?, pet_gender = ?, pet_birthday = ?, pet_color = ?, pet_status = ? 
-            WHERE pet_id = ?`,
-            [pet_name, pet_species, pet_breed, pet_gender, pet_birthday, pet_color, pet_status, pet_id]
-        );
+    static async updatePet(pet_id, updatedData) {
+        const updateFields = Object.keys(updatedData);
+        if (updateFields.length === 0) return { affectedRows: 0 }; // No fields to update
+    
+        const setClause = updateFields.map(field => `${field} = ?`).join(", ");
+        const values = updateFields.map(field => updatedData[field]);
+    
+        const sql = `UPDATE pet_info SET ${setClause} WHERE pet_id = ?`;
+        values.push(pet_id); // Append pet_id for WHERE clause
+    
+        const [result] = await db.execute(sql, values);
         return result;
     }
+    
+    
+    
 
     static async archivePet(pet_id) {
         return db.execute("UPDATE pet_info SET pet_status = 0 WHERE pet_id = ?", [pet_id]);

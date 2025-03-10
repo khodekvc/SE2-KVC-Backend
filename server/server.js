@@ -13,6 +13,8 @@ const authRoutes = require("./routes/authRoutes");
 const usersRoutes = require("./routes/usersRoutes");
 const petRoutes = require("./routes/petRoutes");
 const { authenticate, authorize } = require("./middleware/authMiddleware");
+const vaccineRoutes = require("./routes/vaccineRoutes");
+const recordRoutes = require("./routes/recordRoutes");
 
 // express app initializer
 const app = express();
@@ -73,6 +75,8 @@ app.get("/protected-route", authenticate, (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/user", usersRoutes);
 app.use("/pets", petRoutes);
+app.use("/vax", vaccineRoutes);
+app.use("/recs", recordRoutes);
 
 // starts the server
 app.listen(port, () => {
