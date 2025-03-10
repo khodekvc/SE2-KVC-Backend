@@ -71,7 +71,10 @@ exports.signupPetOwnerStep1 = async (req, res) => {
             fname, lname, email, contact, address, password: await hashPassword(password)
         };
 
-        res.json({ message: "✅ Step 1 completed. Proceed to pet info." });
+        res.json({
+            message: "✅ Step 1 completed. Proceed to pet info.",
+            redirectUrl: "/signup-petowner-petinfo"
+        });
     } catch (error) {
         console.error("Signup Error:", error);
         res.status(500).json({ error: "❌ Server error during signup." });
@@ -79,14 +82,22 @@ exports.signupPetOwnerStep1 = async (req, res) => {
 };
 
 exports.signupPetOwnerStep2 = async (req, res) => {
+    // ✅ Log the full request body
+    console.log("📩 Request Body:", req.body);
+
+    // ✅ Log session data
+    console.log("🗂️ Session Data:", req.session);
+
     const { petname, gender, species, breed, birthdate, captchaInput } = req.body;
 
     if (!req.session.captcha || captchaInput !== req.session.captcha) {
+        console.log("❌ CAPTCHA Mismatch! Expected:", req.session.captcha, "Received:", req.body.captchaInput);
         return res.status(400).json({ error: "❌ Incorrect CAPTCHA!" });
     }
     req.session.captcha = null;
 
     if (!req.session.petOwnerData) {
+        console.log("❌ Missing session petOwnerData! User may have skipped Step 1 or session expired.");
         return res.status(400).json({ error: "❌ Personal info missing. Restart signup process." });
     }
 
@@ -94,8 +105,9 @@ exports.signupPetOwnerStep2 = async (req, res) => {
 
     try {
         const userId = await UserModel.createPetOwner({ fname, lname, email, contact, address, password });
-        await PetModel.createPet({ petname, gender, species, breed, birthdate, userId });
+        const petBirthday = birthdate ? birthdate : null;
 
+        await PetModel.createPet({ petname, gender, species, breed, birthdate: petBirthday, userId });
         const token = generateToken(userId, "owner");
         console.log('Generated Token:', token);
         res.cookie("token", token, {
@@ -106,7 +118,10 @@ exports.signupPetOwnerStep2 = async (req, res) => {
         });
 
         req.session.petOwnerData = null;
-        res.status(201).json({ message: "✅ Pet Owner account created successfully!" });
+        res.status(201).json({
+            message: "✅ Pet Owner account created successfully!",
+            redirectUrl: "/patients"
+        });
     } catch (error) {
         console.error("Signup Error:", error);
         res.status(500).json({ error: "❌ Server error during signup." });
@@ -149,7 +164,10 @@ exports.signupEmployeeRequest = async (req, res) => {
 
         await sendEmail(clinicOwnerEmail, subject, body);
 
-        res.json({ message: "✅ Signup request sent. Await access code from the clinic owner." });
+        res.json({
+            message: "✅ Signup request sent. Await access code from the clinic owner.",
+            redirectUrl: "/signup-employee-accesscode",
+        });
     } catch (err) {
         console.error("Database Error:", err);
         res.status(500).json({ error: "❌ Server error." });
@@ -189,7 +207,10 @@ exports.signupEmployeeComplete = async (req, res) => {
 
         req.session.employeeData = null;
 
-        res.json({ message: "✅ Signup successful! You can now log in." });
+        res.json({
+            message: "✅ Signup successful! You can now log in.",
+            redirectUrl: "/patients",
+        });
     } catch (error) {
         console.error("Employee Signup Error:", error);
         res.status(500).json({ error: "❌ Server error." });
