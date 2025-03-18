@@ -6,11 +6,19 @@ class PetModel {
         return result.length ? result[0] : null;
     }
 
-    static async createPet({ petname, gender, species, breed, birthdate, userId }) {
-        return db.query(
-            "INSERT INTO pet_info (pet_name, pet_gender, pet_species, pet_breed, pet_birthday, pet_vitality, pet_status, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [petname, gender, species, breed, birthdate, true, true, userId]
+    static async findSpeciesByDescription(description) {
+        const [result] = await db.execute("SELECT * FROM pet_species WHERE spec_description = ?", [description]);
+        return result.length ? result[0] : null;
+    }
+
+    static async createPet({ petname, gender, speciesId, breed, birthdate, userId }) {
+        const [result] = await db.query(
+            "INSERT INTO pet_info (pet_name, pet_gender, pet_breed, pet_birthday, pet_vitality, pet_status, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [petname, gender, breed, birthdate, true, true, userId]
         );
+        const petId = result.insertId;
+        await db.query("INSERT INTO match_pet_species (spec_id, pet_id) VALUES (?, ?)", [speciesId, petId]);
+        return petId;
     }
 
     static async updatePet(pet_id, updatedData) {
@@ -26,9 +34,10 @@ class PetModel {
         const [result] = await db.execute(sql, values);
         return result;
     }
-    
-    
-    
+
+    static async updatePetSpecies(pet_id, speciesId) {
+        return db.execute("UPDATE match_pet_species SET spec_id = ? WHERE pet_id = ?", [speciesId, pet_id]);
+    }
 
     static async archivePet(pet_id) {
         return db.execute("UPDATE pet_info SET pet_status = 0 WHERE pet_id = ?", [pet_id]);

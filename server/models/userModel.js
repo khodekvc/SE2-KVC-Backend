@@ -1,10 +1,14 @@
 const db = require("../config/db");
 const bcrypt = require("bcrypt");
 
-
 class UserModel {
     static async getUserById(userId) {
         const [rows] = await db.execute("SELECT * FROM users WHERE user_id = ?", [userId]);
+        return rows.length ? rows[0] : null;
+    }
+
+    static async getOwnerByUserId(userId) {
+        const [rows] = await db.execute("SELECT * FROM owner WHERE user_id = ?", [userId]);
         return rows.length ? rows[0] : null;
     }
 
@@ -28,14 +32,14 @@ class UserModel {
         return results.length > 0;
     }
 
-    static async createPetOwner({ fname, lname, email, contact, address, password }) {
+    static async createPetOwner({ fname, lname, email, contact, address, password, altPerson1, altContact1 }) {
         const [userResult] = await db.query(
             "INSERT INTO users (user_email, user_password, user_firstname, user_lastname, user_contact, user_role) VALUES (?, ?, ?, ?, ?, ?)",
             [email, password, fname, lname, contact, "owner"]
         );
         const userId = userResult.insertId;
         
-        await db.execute("INSERT INTO owner (user_id, owner_address) VALUES (?, ?)", [userId, address]);
+        await db.execute("INSERT INTO owner (user_id, owner_address, owner_alt_person1, owner_alt_contact1) VALUES (?, ?, ?, ?, ?)", [userId, address, altPerson1, altContact1]);
         
         return userId;
     }

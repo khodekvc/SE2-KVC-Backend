@@ -70,6 +70,7 @@ exports.signupPetOwnerStep1 = async (req, res) => {
         req.session.petOwnerData = {
             fname, lname, email, contact, address, password: await hashPassword(password)
         };
+        req.session.step1Completed = true;
 
         res.json({ message: "✅ Step 1 completed. Proceed to pet info." });
     } catch (error) {
@@ -79,22 +80,34 @@ exports.signupPetOwnerStep1 = async (req, res) => {
 };
 
 exports.signupPetOwnerStep2 = async (req, res) => {
-    const { petname, gender, species, breed, birthdate, captchaInput } = req.body;
+    const { petname, gender, speciesDescription, breed, birthdate, altPerson1, altContact1, captchaInput } = req.body;
 
     if (!req.session.captcha || captchaInput !== req.session.captcha) {
         return res.status(400).json({ error: "❌ Incorrect CAPTCHA!" });
     }
     req.session.captcha = null;
 
-    if (!req.session.petOwnerData) {
-        return res.status(400).json({ error: "❌ Personal info missing. Restart signup process." });
+    if (!req.session.petOwnerData || !req.session.step1Completed) {
+        return res.status(400).json({ error: "❌ Personal info missing or Step 1 not completed. Restart signup process." });
     }
 
     const { fname, lname, email, contact, address, password } = req.session.petOwnerData;
 
     try {
-        const userId = await UserModel.createPetOwner({ fname, lname, email, contact, address, password });
-        await PetModel.createPet({ petname, gender, species, breed, birthdate, userId });
+        // Fetch the species ID based on the species description
+        const species = await PetModel.findSpeciesByDescription(speciesDescription);
+        if (!species) {
+            return res.status(400).json({ error: "❌ Invalid species selected." });
+        }
+        const speciesId = species.spec_id;
+
+        console.log("Creating pet owner...");
+        const userId = await UserModel.createPetOwner({ fname, lname, email, contact, address, password, altPerson1, altContact1 });
+        console.log("Pet owner created with ID:", userId);
+
+        console.log("Creating pet...");
+        const petId = await PetModel.createPet({ petname, gender, speciesId, breed, birthdate, userId });
+        console.log("Pet created with ID:", petId);
 
         const token = generateToken(userId, "owner");
         console.log('Generated Token:', token);
@@ -106,9 +119,10 @@ exports.signupPetOwnerStep2 = async (req, res) => {
         });
 
         req.session.petOwnerData = null;
+        req.session.step1Completed = null;
         res.status(201).json({ message: "✅ Pet Owner account created successfully!" });
     } catch (error) {
-        console.error("Signup Error:", error);
+        console.error("Signup Error:", error.message);
         res.status(500).json({ error: "❌ Server error during signup." });
     }
 };
