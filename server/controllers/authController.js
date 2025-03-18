@@ -72,7 +72,10 @@ exports.signupPetOwnerStep1 = async (req, res) => {
         };
         req.session.step1Completed = true;
 
-        res.json({ message: "✅ Step 1 completed. Proceed to pet info." });
+        res.json({
+            message: "✅ Step 1 completed. Proceed to pet info.",
+            redirectUrl: "/signup-petowner-petinfo"
+        });
     } catch (error) {
         console.error("Signup Error:", error);
         res.status(500).json({ error: "❌ Server error during signup." });
@@ -83,6 +86,7 @@ exports.signupPetOwnerStep2 = async (req, res) => {
     const { petname, gender, speciesDescription, breed, birthdate, altPerson1, altContact1, captchaInput } = req.body;
 
     if (!req.session.captcha || captchaInput !== req.session.captcha) {
+        console.log("❌ CAPTCHA Mismatch! Expected:", req.session.captcha, "Received:", req.body.captchaInput);
         return res.status(400).json({ error: "❌ Incorrect CAPTCHA!" });
     }
     req.session.captcha = null;
@@ -109,6 +113,7 @@ exports.signupPetOwnerStep2 = async (req, res) => {
         const petId = await PetModel.createPet({ petname, gender, speciesId, breed, birthdate, userId });
         console.log("Pet created with ID:", petId);
 
+        await PetModel.createPet({ petname, gender, species, breed, birthdate: petBirthday, userId });
         const token = generateToken(userId, "owner");
         console.log('Generated Token:', token);
         res.cookie("token", token, {
@@ -163,7 +168,10 @@ exports.signupEmployeeRequest = async (req, res) => {
 
         await sendEmail(clinicOwnerEmail, subject, body);
 
-        res.json({ message: "✅ Signup request sent. Await access code from the clinic owner." });
+        res.json({
+            message: "✅ Signup request sent. Await access code from the clinic owner.",
+            redirectUrl: "/signup-employee-accesscode",
+        });
     } catch (err) {
         console.error("Database Error:", err);
         res.status(500).json({ error: "❌ Server error." });
@@ -203,7 +211,10 @@ exports.signupEmployeeComplete = async (req, res) => {
 
         req.session.employeeData = null;
 
-        res.json({ message: "✅ Signup successful! You can now log in." });
+        res.json({
+            message: "✅ Signup successful! You can now log in.",
+            redirectUrl: "/patients",
+        });
     } catch (error) {
         console.error("Employee Signup Error:", error);
         res.status(500).json({ error: "❌ Server error." });

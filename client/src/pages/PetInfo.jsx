@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { Button } from '../components/Button';
 import FormGroup from '../components/FormGroup';
@@ -13,14 +13,58 @@ const PetInfo = () => {
     birthdate: "",
     captcha: "",
   });
-
+  const [captcha, setCaptcha] = useState({ image: "", captchaKey: "" });
+  const [message, setMessage] = useState("");
+  
+  useEffect(() => {
+      fetchCaptcha();
+    }, []);
+  
+    const fetchCaptcha = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/auth/captcha", {
+          credentials: "include", // Ensure session persistence
+        });
+        const data = await response.json();
+        console.log("CAPTCHA loaded:", data);  
+        setCaptcha({ image: data.image, captchaKey: data.captchaKey });
+      } catch (error) {
+        console.error("Failed to load CAPTCHA:", error);
+      }
+  };
+  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Pet Info Submitted:", formData);
+
+    try {
+    const response = await fetch("http://localhost:5000/auth/signup/petowner-step2", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Login failed");
+
+    // ✅ Get token from headers or body
+    const token = response.headers.get("Authorization")?.split(" ")[1] || data.token;
+    if (token) {
+      localStorage.setItem("jwt", token);
+    }
+
+    setMessage(data.message);
+      window.location.replace(data.redirectUrl);
+  } catch (error) {
+    setMessage(error.message);
+  }
   };
 
   return (
@@ -103,12 +147,12 @@ const PetInfo = () => {
           <div className="forms-group captcha">
             <label htmlFor="captcha">Enter Captcha</label>
             <div className="captcha-container">
-              <img className="generated" src="SignUpPetOwnerServlet" alt="CAPTCHA" id="captchaImage" />
+              <img src={`${captcha.image}`} className="generated" alt="CAPTCHA" />
               <input 
                 type="text" 
                 id="captcha" 
-                name="captcha" 
-                value={formData.captcha} 
+                name="captchaInput" 
+                value={formData.captchaInput} 
                 onChange={handleChange} 
                 required 
               />
@@ -117,7 +161,7 @@ const PetInfo = () => {
 
           <div className="button-group">
             <Button buttonStyle='btn--secondary' onClick={() => window.history.back()} className="form-btn-3">BACK</Button>
-            <Button buttonStyle='btn--primary' type="submit" className="form-btn-1" to="/patients">SIGN UP</Button>
+            <Button buttonStyle='btn--primary' type="submit" className="form-btn-1">SIGN UP</Button>
           </div>
         </form>
       </div>
