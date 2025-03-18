@@ -1,12 +1,13 @@
 import { Menu, LogOut } from "lucide-react";
 import "../css/Header.css";
 import { Link } from 'react-router-dom';
+import React from 'react';
 
 const Header = ({ toggleSidebar }) => {
   return (
     <header className="header">
       <div className="header-left">
-        <button className="burger-menu" onClick={toggleSidebar}>
+        <button className="burger-menu" onClick={toggleSidebar} aria-label="menu">
           <Menu size={24} />
         </button>
         <div className="logo-container">
@@ -18,10 +19,10 @@ const Header = ({ toggleSidebar }) => {
         </div>
       </div>
       <Link to="/" className="logout-link">
-      <button className="logout-btn">
-        <span className="logout-text">LOG OUT</span>
-        <LogOut size={24} className="logout-icon" />
-      </button>
+        <button className="logout-btn">
+          <span className="logout-text">LOG OUT</span>
+          <LogOut size={24} className="logout-icon" />
+        </button>
       </Link>
     </header>
   );
