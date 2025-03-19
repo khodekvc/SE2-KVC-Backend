@@ -39,7 +39,7 @@ class UserModel {
         );
         const userId = userResult.insertId;
         
-        await db.execute("INSERT INTO owner (user_id, owner_address, owner_alt_person1, owner_alt_contact1) VALUES (?, ?, ?, ?, ?)", [userId, address, altPerson1, altContact1]);
+        await db.execute("INSERT INTO owner (user_id, owner_address, owner_alt_person1, owner_alt_contact1) VALUES (?, ?, ?, ?)", [userId, address, altPerson1, altContact1]);
         
         return userId;
     }

@@ -42,6 +42,11 @@ const updateRecordInDB = async (recordId, recordData) => {
     return result.affectedRows;
 };
 
+const getRecordById = async (recordId) => {
+    const [result] = await db.query("SELECT * FROM record_info WHERE record_id = ?", [recordId]);
+    return result.length ? result[0] : null;
+};
+
 const insertMatchRecLab = async (recordId, labId) => {
     await db.query("INSERT INTO match_rec_lab (record_id, lab_id) VALUES (?, ?)", [recordId, labId]);
 };
@@ -51,4 +56,4 @@ const updateMatchRecLab = async (recordId, labId) => {
     await db.query("INSERT INTO match_rec_lab (record_id, lab_id) VALUES (?, ?)", [recordId, labId]);
 };
 
-module.exports = { insertLabInfo, getLabIdByDescription, insertDiagnosis, insertSurgeryInfo, insertRecord, updateRecordInDB, insertMatchRecLab, updateMatchRecLab };
+module.exports = { insertLabInfo, getLabIdByDescription, insertDiagnosis, insertSurgeryInfo, insertRecord, updateRecordInDB, getRecordById, insertMatchRecLab, updateMatchRecLab };
