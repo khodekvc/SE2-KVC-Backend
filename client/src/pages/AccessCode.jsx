@@ -6,16 +6,42 @@ import "../css/Forms.css";
 
 const AccessCode = () => {
   const [formData, setFormData] = useState({
-    accesscode: "",
+    accessCode: "",
   });
+  const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Access code entered:", formData.accesscode);
+    console.log("Access code entered:", formData.accessCode);
+
+    try {
+    const response = await fetch("http://localhost:5000/auth/signup/employee-verify", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Login failed");
+
+    // ✅ Get token from headers or body
+    const token = response.headers.get("Authorization")?.split(" ")[1] || data.token;
+    if (token) {
+      localStorage.setItem("jwt", token);
+    }
+
+    setMessage(data.message);
+      window.location.replace(data.redirectUrl);
+  } catch (error) {
+    setMessage(error.message);
+  }
   };
 
   return (
@@ -34,13 +60,13 @@ const AccessCode = () => {
         <form onSubmit={handleSubmit} className="code-formgroup">
           <FormGroup 
             label="Please enter the access code sent to your email by the doctor to confirm your role."
-            type="number" 
-            name="accesscode" 
-            value={formData.accesscode} 
+            type="text" 
+            name="accessCode" 
+            value={formData.accessCode} 
             onChange={handleChange} 
             required 
           />
-          <Button buttonStyle='btn--primary' to='/patients' className="form-btn-1">SUBMIT</Button>
+          <Button buttonStyle='btn--primary' type='submit' className="form-btn-1">SUBMIT</Button>
         </form>
       </div>
     </div>
