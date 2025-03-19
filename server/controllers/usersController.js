@@ -13,13 +13,19 @@ exports.updateEmployeeProfile = [
         console.log("Request Body:", req.body);
         console.log("User ID from JWT:", userId);
 
-        if (!firstname || !lastname || !email) {
-            return res.status(400).json({ error: "❌ All fields are required!" });
-        }
-
         try {
-            // Update user profile
-            await UserModel.updateEmployeeProfile(userId, firstname, lastname, email, contact);
+            // Fetch current profile data
+            const currentProfile = await UserModel.getUserById(userId);
+
+            // Update only the fields that are provided
+            const updatedProfile = {
+                firstname: firstname || currentProfile.user_firstname,
+                lastname: lastname || currentProfile.user_lastname,
+                email: email || currentProfile.user_email,
+                contact: contact || currentProfile.user_contact
+            };
+
+            await UserModel.updateEmployeeProfile(userId, updatedProfile.firstname, updatedProfile.lastname, updatedProfile.email, updatedProfile.contact);
 
             res.json({ message: "✅ Employee profile updated successfully!" });
         } catch (error) {
@@ -39,12 +45,23 @@ exports.updateOwnerProfile = [
         console.log("Request Body:", req.body);
         console.log("User ID from JWT:", userId);
 
-        if (!firstname || !lastname || !email) {
-            return res.status(400).json({ error: "❌ All fields are required!" });
-        }
-
         try {
-            await UserModel.updateOwnerProfile(userId, firstname, lastname, email, contact, address, altperson, altcontact);
+            // Fetch current profile data
+            const currentProfile = await UserModel.getUserById(userId);
+            const currentOwnerProfile = await UserModel.getOwnerByUserId(userId);
+
+            // Update only the fields that are provided
+            const updatedProfile = {
+                firstname: firstname || currentProfile.user_firstname,
+                lastname: lastname || currentProfile.user_lastname,
+                email: email || currentProfile.user_email,
+                contact: contact || currentProfile.user_contact,
+                address: address || currentOwnerProfile.owner_address,
+                altperson: altperson || currentOwnerProfile.owner_alt_person1,
+                altcontact: altcontact || currentOwnerProfile.owner_alt_contact1
+            };
+
+            await UserModel.updateOwnerProfile(userId, updatedProfile.firstname, updatedProfile.lastname, updatedProfile.email, updatedProfile.contact, updatedProfile.address, updatedProfile.altperson, updatedProfile.altcontact);
 
             res.json({ message: "✅ Pet owner profile updated successfully!" });
         } catch (error) {
