@@ -22,6 +22,12 @@ class PetModel {
         );
         return result;
     }
+<<<<<<< Updated upstream
+=======
+    
+    
+    
+>>>>>>> Stashed changes
 
     static async archivePet(pet_id) {
         return db.execute("UPDATE pet_info SET pet_status = 0 WHERE pet_id = ?", [pet_id]);

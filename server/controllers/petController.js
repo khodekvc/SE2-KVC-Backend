@@ -1,10 +1,17 @@
 const PetModel = require("../models/petModel");
 
 // Update pet profile (only for clinicians and doctors)
+<<<<<<< Updated upstream
 exports.updatePetProfile = [// Check if the user is a doctor or clinician
     async (req, res) => {
         const { pet_name, pet_species, pet_breed, pet_gender, pet_birthday, pet_color, pet_status } = req.body;
         const { pet_id } = req.params; // Extract pet_id from URL
+=======
+
+exports.updatePetProfile = async (req, res) => {
+    const { pet_id } = req.params;
+    const updateFields = req.body;
+>>>>>>> Stashed changes
 
         console.log("Received update request:", { pet_id, pet_name, pet_species, pet_gender, pet_status });
 
@@ -13,9 +20,18 @@ exports.updatePetProfile = [// Check if the user is a doctor or clinician
             return res.status(400).json({ error: "❌ pet_name, pet_species, pet_gender, and pet_status are required!" });
         }
 
+<<<<<<< Updated upstream
         try {
             // Check if the pet exists using the PetModel
             const existingPet = await PetModel.findById(pet_id);
+=======
+        let updatedData = {};
+        Object.keys(updateFields).forEach((key) => {
+            if (updateFields[key] !== undefined && updateFields[key] !== "") {
+                updatedData[key] = updateFields[key];
+            }
+        });
+>>>>>>> Stashed changes
 
             if (!existingPet) {
                 return res.status(404).json({ error: "❌ Pet not found. Cannot update." });
@@ -26,6 +42,7 @@ exports.updatePetProfile = [// Check if the user is a doctor or clinician
 
             console.log("Update Result:", result); // Debugging log
 
+<<<<<<< Updated upstream
             if (result.affectedRows === 0) {
                 return res.status(400).json({ error: "❌ No changes made. Either the pet ID does not exist or the new data is the same as the current data." });
             }
@@ -36,8 +53,47 @@ exports.updatePetProfile = [// Check if the user is a doctor or clinician
             console.error("Pet Profile Update Error:", error);
             res.status(500).json({ error: "❌ Server error while updating pet profile." });
         }
+=======
+                if (
+                    updatedData.pet_age_year !== computedYears ||
+                    updatedData.pet_age_month !== computedMonths
+                ) {
+                    return res.status(400).json({
+                        error: `❌ Age mismatch! The computed age based on birthday is ${computedYears} years and ${computedMonths} months.`,
+                    });
+                }
+            }
+        }
+
+        // If no valid fields are provided, return an error
+        if (Object.keys(updatedData).length === 0) {
+            return res.status(400).json({ error: "❌ No valid fields to update." });
+        }
+
+        // Perform the update
+        const result = await PetModel.updatePet(pet_id, updatedData);
+
+        console.log("Update Result:", result);
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ error: "❌ No changes made (pet ID may not exist or data is the same)." });
+        }
+
+        res.json({ message: "✅ Pet profile updated successfully!" });
+
+    } catch (error) {
+        console.error("Pet Profile Update Error:", error);
+        res.status(500).json({ error: "❌ Server error: " + error.message });
+>>>>>>> Stashed changes
     }
 ];
+
+
+
+
+
+
+
+
 
 exports.archivePet = async (req, res) => {
     const { pet_id } = req.params;

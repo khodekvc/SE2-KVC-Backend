@@ -87,6 +87,15 @@ exports.signupPetOwnerStep1 = async (req, res) => {
 };
 
 exports.signupPetOwnerStep2 = async (req, res) => {
+<<<<<<< Updated upstream
+=======
+    // ✅ Log the full request body
+    console.log("📩 Request Body:", req.body);
+
+    // ✅ Log session data
+    console.log("🗂️ Session Data:", req.session);
+
+>>>>>>> Stashed changes
     const { petname, gender, species, breed, birthdate, captchaInput } = req.body;
 
     if (!req.session.captcha || captchaInput !== req.session.captcha) {
@@ -95,6 +104,10 @@ exports.signupPetOwnerStep2 = async (req, res) => {
     req.session.captcha = null;
 
     if (!req.session.petOwnerData) {
+<<<<<<< Updated upstream
+=======
+        console.log("❌ Missing session petOwnerData! User may have skipped Step 1 or session expired.");
+>>>>>>> Stashed changes
         return res.status(400).json({ error: "❌ Personal info missing. Restart signup process." });
     }
 
@@ -102,8 +115,14 @@ exports.signupPetOwnerStep2 = async (req, res) => {
 
     try {
         const userId = await UserModel.createPetOwner({ fname, lname, email, contact, address, password });
+<<<<<<< Updated upstream
         await PetModel.createPet({ petname, gender, species, breed, birthdate, userId });
 
+=======
+        const petBirthday = birthdate ? birthdate : null;
+
+        await PetModel.createPet({ petname, gender, species, breed, birthdate: petBirthday, userId });
+>>>>>>> Stashed changes
         const token = generateToken(userId, "owner");
         console.log('Generated Token:', token);
         res.cookie("token", token, {
@@ -114,7 +133,14 @@ exports.signupPetOwnerStep2 = async (req, res) => {
         });
 
         req.session.petOwnerData = null;
+<<<<<<< Updated upstream
         res.status(201).json({ message: "✅ Pet Owner account created successfully!" });
+=======
+        res.status(201).json({
+            message: "✅ Pet Owner account created successfully!",
+            redirectUrl: "/patients"
+        });
+>>>>>>> Stashed changes
     } catch (error) {
         console.error("Signup Error:", error);
         res.status(500).json({ error: "❌ Server error during signup." });
@@ -221,5 +247,6 @@ exports.logoutUser = (req, res) => {
         return res.status(500).json({ error: "❌ Server error during logout" });
     }
 };
+
 
 
