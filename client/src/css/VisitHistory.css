@@ -19,7 +19,7 @@
   }
   
   .visit-history-header h2 {
-    color: #ff6b00;
+    color: var(--orange-color);
     font-size: 2rem;
   
   }
@@ -34,12 +34,12 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #ff6b00;
+    color: var(--orange-color);
     font-size: 1.1rem;
   }
   
   .date-filter svg {
-    color: #ff6b00;
+    color: var(--orange-color);
   }
   
   .visit-content {
@@ -62,7 +62,7 @@
     position: absolute;
     top: 1rem;
     right: 2rem;
-    background-color: #ff6b00;
+    background-color: var(--orange-color);
     color: white;
     border: none;
     padding: 0.4rem 1.5rem;
@@ -76,7 +76,7 @@
   }
   
   .add-record-btn:hover {
-    background-color: #e65c00;
+    background-color: var(--blue-color);
   }
   
   .add-record-btn svg {
@@ -109,13 +109,13 @@
   .visit-table th {
     padding: 0.5rem;
     text-align: center;
+    background: white;
     color: #333;
     font-weight: 600;
     border-bottom: 2px solid #eee;
   }
   
   .visit-table td {
-    
     text-align: center;
     border-bottom: 1px solid #eee;
     padding: 0.2rem;
@@ -131,7 +131,7 @@
   }
   
   .row-even {
-    background-color: #f8f8f8;
+    background-color: var(--lblue-color);
   }
   
   .action-btn {
@@ -144,7 +144,7 @@
   }
   
   .action-btn:hover {
-    color: #ff6b00;
+    color: var(--blue-color);
   }
   
   @media (max-width: 768px) {

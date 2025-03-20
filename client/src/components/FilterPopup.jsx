@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { X, Calendar } from "lucide-react"
 import "../css/FilterModal.css"
+import React from 'react';
 
 const FilterModal = ({ isOpen, onClose, onApply, onReset, type = "patient" }) => {
   const [filters, setFilters] = useState(
@@ -51,7 +52,7 @@ const FilterModal = ({ isOpen, onClose, onApply, onReset, type = "patient" }) =>
   return (
     <div className="filter-modal-overlay">
       <div className={`filter-modal ${type}-filter`}>
-        <button className="close-button" onClick={onClose}>
+        <button className="close-button" onClick={onClose} aria-label="close">
           <X size={20} />
         </button>
         <h2>Filters</h2>

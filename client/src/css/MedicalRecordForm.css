@@ -11,7 +11,7 @@
   
   .medical-info h2,
   .visit-details h2 {
-    color: #ff6b00;
+    color: var(--orange-color);
     font-size: 1.5rem;
     text-align: center;
     margin-bottom: 1rem;
@@ -58,7 +58,7 @@
   .form-field textarea:focus,
   .date-input input:focus {
     outline: none;
-    border-color: #ff6b00;
+    border-color: var(--orange-color);
   }
   
   .date-input {
@@ -131,7 +131,7 @@
   
   .unlock-diagnosis-btn {
     margin-top: 0.5rem;
-    background-color: #ff6b00;
+    background-color: var(--orange-color);
     color: white;
     border: none;
     padding: 0.5rem 1rem;

@@ -32,11 +32,11 @@
   }
   
   .close-button:hover {
-    color: #ff6b00;
+    color: var(--orange-color);
   }
   
   .filter-modal h2 {
-    color: #ff6b00;
+    color: var(--orange-color);
     text-align: center;
     margin-bottom: 1.5rem;
     font-size: 1.5rem;
@@ -47,7 +47,7 @@
   }
   
   .filter-section h3 {
-    color: #ff6b00;
+    color: var(--orange-color);
     margin-bottom: 1rem;
     font-size: 1.1rem;
   }
@@ -55,7 +55,11 @@
   .filter-section label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #ff6b00;
+    color: var(--orange-color);
+  }
+
+  .sort-order label {
+    color: black;
   }
   
   /*  for patient directory */
@@ -82,6 +86,10 @@
   .patient-filter .sort-option {
     margin-bottom: 1rem;
   }
+
+  .sort-options label {
+    color: black;
+  }
   
   .patient-filter .sort-order {
     display: flex;
@@ -106,6 +114,7 @@
   .visit-filter .date-range {
     display: flex;
     gap: 1rem;
+    width: 48%
   }
   
   .visit-filter .date-input-container {
@@ -148,21 +157,22 @@
   }
   
   .reset-button {
-    background-color: #ff4444;
-    color: white;
+    border: 1px solid var(--orange-color);
+    background-color: white;
+    color: var(--orange-color);
   }
   
   .apply-button {
-    background-color: #ff6b00;
+    background-color: var(--orange-color);
     color: white;
   }
   
   .reset-button:hover {
-    background-color: #ff3333;
+    background-color: var(--lyellow-color);
   }
   
   .apply-button:hover {
-    background-color: #e65c00;
+    background-color: var(--blue-color);
   }
   
   @media (max-width: 768px) {

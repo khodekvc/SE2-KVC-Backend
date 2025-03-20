@@ -1,14 +1,12 @@
 import React from 'react';
 import '../css/Landing.css';
 import Navbar from "../components/Navbar";
-import { Link  } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationDot, faPhone, faEnvelope, faClock } from '@fortawesome/free-solid-svg-icons';
 
-
 function Landing() {
-  const button = true;
   return (
     <>
      <Navbar />
@@ -19,9 +17,13 @@ function Landing() {
               KHO <br /> VETERINARY <br /> CLINIC
             </h1>
             <p>Four Paws, Two Feet, One Heart</p>
-            <Link to="/signup-petowner">
-              <Button buttonStyle="btn--primary">SIGN UP</Button>
-            </Link>
+            <Button
+              buttonStyle='btn--primary'
+              buttonSize='btn--large'
+              to='/signup-petowner'
+            >
+              SIGN UP
+            </Button>
           </div>
         </section>
       </div>

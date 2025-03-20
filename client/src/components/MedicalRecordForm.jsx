@@ -140,7 +140,7 @@ const MedicalRecordForm = ({
         </div>
         <div className="form-row">
           {renderField("Laboratories", "laboratories", "select", {
-            selectOptions: ["X-ray", "Blood Test", "Ultrasound"],
+            selectOptions: ["CBC", "Ultrasound", "ECG", "X-ray", "Blood Chem", "Microscopy","Progesterone Test"],
           })}
           {renderField("File", "file", "file")}
         </div>

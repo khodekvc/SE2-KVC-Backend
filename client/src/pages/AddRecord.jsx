@@ -6,8 +6,10 @@ import "../css/AddRecord.css"
 import { useDiagnosisLock } from "../contexts/DiagnosisLockContext"
 import { useConfirmDialog } from "../contexts/ConfirmDialogContext"
 import MedicalRecordForm from "../components/MedicalRecordForm"
+import { useUserRole } from "../contexts/UserRoleContext"
 
 const AddRecord = ({ onClose, onSubmit }) => {
+  const { hasPermission } = useUserRole()
   const { isDiagnosisLocked } = useDiagnosisLock()
   const { showConfirmDialog } = useConfirmDialog()
   const [formData, setFormData] = useState({
@@ -96,7 +98,7 @@ const AddRecord = ({ onClose, onSubmit }) => {
       <MedicalRecordForm
   formData={formData}
   isEditing={true}
-  isDiagnosisLocked={isDiagnosisLocked}
+  isDiagnosisLocked={!hasPermission("canAlwaysEditDiagnosis") && isDiagnosisLocked}
   onInputChange={handleInputChange}
   isAddRecord={true}
   errors={errors} 
