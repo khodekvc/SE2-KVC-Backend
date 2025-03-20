@@ -1,13 +1,11 @@
 const express = require("express");
-const { addRecord, updateRecord } = require("../controllers/recordController");
+const recordController = require("../controllers/recordController");
 const { authenticate, authorize } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Only doctors and clinicians can add records
-router.post("/:petId", authenticate, authorize({ roles: ["doctor", "clinician"] }), addRecord);
-
-// Only doctors and clinicians can update recordsn
-router.put("/:recordId", authenticate, authorize({ roles: ["doctor", "clinician"] }), updateRecord);
+router.post("/records/:petId", authenticate, authorize(["doctor", "clinician"]), recordController.addRecord);
+router.put("/records/:recordId", authenticate, authorize(["doctor", "clinician"]), recordController.updateRecord);
+router.get("/records/request-access-code", authenticate, authorize(["clinician"]), recordController.requestDiagnosisAccessCode);
 
 module.exports = router;
