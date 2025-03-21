@@ -39,11 +39,16 @@ exports.updateEmployeeProfile = [
 exports.updateOwnerProfile = [
     authenticate,
     async (req, res) => {
-        const { firstname, lastname, email, contact, address, altperson, altcontact } = req.body;
+        const { firstname, lastname, email, contact, address, altperson1, altcontact1, altperson2, altcontact2 } = req.body;
         const userId = req.user.userId;
 
         console.log("Request Body:", req.body);
         console.log("User ID from JWT:", userId);
+
+        // Validate that if altperson2 is provided, altcontact2 must also be provided
+        if ((altperson2 && !altcontact2) || (!altperson2 && altcontact2)) {
+            return res.status(400).json({ error: "❌ If altPerson2 or altContact2 is provided, both must be provided." });
+        }
 
         try {
             // Fetch current profile data
@@ -57,11 +62,13 @@ exports.updateOwnerProfile = [
                 email: email || currentProfile.user_email,
                 contact: contact || currentProfile.user_contact,
                 address: address || currentOwnerProfile.owner_address,
-                altperson: altperson || currentOwnerProfile.owner_alt_person1,
-                altcontact: altcontact || currentOwnerProfile.owner_alt_contact1
+                altperson1: altperson1 || currentOwnerProfile.owner_alt_person1,
+                altcontact1: altcontact1 || currentOwnerProfile.owner_alt_contact1,
+                altperson2: altperson2 || currentOwnerProfile.owner_alt_person2,
+                altcontact2: altcontact2 || currentOwnerProfile.owner_alt_contact2
             };
 
-            await UserModel.updateOwnerProfile(userId, updatedProfile.firstname, updatedProfile.lastname, updatedProfile.email, updatedProfile.contact, updatedProfile.address, updatedProfile.altperson, updatedProfile.altcontact);
+            await UserModel.updateOwnerProfile(userId, updatedProfile.firstname, updatedProfile.lastname, updatedProfile.email, updatedProfile.contact, updatedProfile.address, updatedProfile.altperson1, updatedProfile.altcontact1, updatedProfile.altperson2, updatedProfile.altcontact2);
 
             res.json({ message: "✅ Pet owner profile updated successfully!" });
         } catch (error) {
