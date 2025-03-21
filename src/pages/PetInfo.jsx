@@ -100,6 +100,28 @@ const PetInfo = () => {
             onChange={handleChange} 
           />
 
+<<<<<<< HEAD:src/pages/PetInfo.jsx
+=======
+          <div className="signup-form-row">
+          <FormGroup 
+            label="Emergency Contact Person" 
+            type="text" 
+            name="emergencyperson" 
+            value={formData.emergencyperson} 
+            onChange={handleChange} 
+            required
+          />
+          <FormGroup 
+            label="Emergency Contact Number" 
+            type="text" 
+            name="emergencynumber" 
+            value={formData.emergencynumber} 
+            onChange={handleChange}
+            required 
+          />
+          </div>
+
+>>>>>>> parent of 2229f39 (connected backend and frontend ver 1000000):client/src/pages/PetInfo.jsx
           <div className="forms-group captcha">
             <label htmlFor="captcha">Enter Captcha</label>
             <div className="captcha-container">
