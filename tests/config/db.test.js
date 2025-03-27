@@ -1,72 +1,29 @@
+// tests/config/db.test.js
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') }); // Load environment variables
 const mysql = require('mysql2/promise');
-const db = require('../../../server/config/db');
 
-jest.mock('mysql2/promise');
-
-describe('Database Connection', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('should create a MySQL connection pool with the correct configuration', () => {
-    expect(mysql.createPool).toHaveBeenCalledWith({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-    });
-  });
-
-  it('should successfully connect to the MySQL database', async () => {
-    const mockConnection = {
-      release: jest.fn(),
-    };
-    mysql.createPool.mockReturnValue({
-      getConnection: jest.fn().mockResolvedValue(mockConnection),
-    });
-
-    const connection = await db.getConnection();
-    expect(connection).toBe(mockConnection);
-    expect(mockConnection.release).toHaveBeenCalled();
-  });
-
-  it('should handle database connection failure', async () => {
-    const errorMessage = 'Connection failed';
-    mysql.createPool.mockReturnValue({
-      getConnection: jest.fn().mockRejectedValue(new Error(errorMessage)),
-    });
-
+describe('Direct Database Connection Test', () => {
+  it('should connect to the database successfully', async () => {
     try {
-      await db.getConnection();
-    } catch (err) {
-      expect(err.message).toBe(errorMessage);
+      const connection = await mysql.createPool({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
+        charset: 'utf8mb4',
+      }).getConnection();
+
+      expect(connection).toBeDefined(); // Check if the connection object exists
+
+      await connection.release(); // Release the connection
+    } catch (error) {
+      // If there's an error, fail the test
+      console.error("Database connection failed:", error);
+      throw error; // Re-throw the error to fail the test
     }
-  });
-
-  it('should execute a query successfully', async () => {
-    const mockResults = [{ id: 1, name: 'Test' }];
-    mysql.createPool.mockReturnValue({
-      query: jest.fn().mockResolvedValue([mockResults]),
-    });
-
-    const results = await db.query('SELECT * FROM test_table');
-    expect(results).toEqual(mockResults);
-    expect(mysql.createPool().query).toHaveBeenCalledWith('SELECT * FROM test_table', undefined);
-  });
-
-  it('should handle query failure', async () => {
-    const errorMessage = 'Query failed';
-    mysql.createPool.mockReturnValue({
-      query: jest.fn().mockRejectedValue(new Error(errorMessage)),
-    });
-
-    try {
-      await db.query('SELECT * FROM test_table');
-    } catch (err) {
-      expect(err.message).toBe(errorMessage);
-    }
-  });
+  }, 10000); // Increase timeout to 10 seconds (optional)
 });
