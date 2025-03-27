@@ -1,4 +1,4 @@
-const db = require('../../../server/config/db');
+const db = require('../../server/config/db');
 const {
   insertLabInfo,
   getLabIdByDescription,
@@ -12,7 +12,7 @@ const {
   updateDiagnosisText
 } = require('../../../server/models/recordModel');
 
-jest.mock('../../../server/config/db');
+jest.mock('../../server/config/db');
 
 describe('RecordModel', () => {
   beforeEach(() => {

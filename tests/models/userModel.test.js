@@ -1,7 +1,7 @@
-const db = require('../../../server/config/db');
+const db = require('../../server/config/db');
 const UserModel = require('../../../server/models/userModel');
 
-jest.mock('../../../server/config/db');
+jest.mock('../../server/config/db');
 
 describe('UserModel', () => {
   beforeEach(() => {

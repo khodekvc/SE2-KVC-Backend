@@ -1,7 +1,7 @@
-const db = require('../../../server/config/db');
+const db = require('../../server/config/db');
 const VaccineModel = require('../../../server/models/vaccineModel');
 
-jest.mock('../../../server/config/db');
+jest.mock('../../server/config/db');
 
 describe('VaccineModel', () => {
   beforeEach(() => {
