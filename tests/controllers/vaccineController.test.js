@@ -1,10 +1,10 @@
 const request = require('supertest');
 const express = require('express');
 const session = require('express-session');
-const vaccineController = require('../../../server/controllers/vaccineController');
-const VaccineModel = require('../../../server/models/vaccineModel');
+const vaccineController = require('../../server/controllers/vaccineController');
+const VaccineModel = require('../../server/models/vaccineModel');
 
-jest.mock('../../../server/models/vaccineModel');
+jest.mock('../../server/models/vaccineModel');
 
 const app = express();
 app.use(express.json());
