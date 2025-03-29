@@ -1,244 +1,92 @@
-const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+// server/controllers/authController.js
+const UserModel = require('../../models/userModel'); // Adjust path if needed
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-const UserModel = require("../models/userModel");
-const PetModel = require("../models/petModel");
-const { generateCaptcha, generateCaptchaImage } = require("../utils/captchaUtility");
-const { hashPassword } = require("../utils/passwordUtility");
-const { generateToken } = require("../utils/authUtility");
-const { sendEmail } = require("../utils/emailUtility");
-
-exports.getCaptcha = (req, res) => {
-    const captchaText = generateCaptcha();
-    const captchaImage = generateCaptchaImage(captchaText);
-
-    req.session.captcha = captchaText;
-    res.json({ image: captchaImage, captchaKey: captchaText });
+// Assume generateToken is defined correctly elsewhere or within this file
+const generateToken = (userId, userRole) => {
+    const payload = { userId, userRole };
+    return jwt.sign(payload, process.env.JWT_SECRET || 'fallback-secret', { expiresIn: '15m' }); // Ensure secret exists
 };
 
+
 exports.loginUser = async (req, res) => {
+    console.log('\n[Controller Debug] --- loginUser START ---'); // Mark start
     try {
         const { email, password, captchaInput } = req.body;
+        console.log(`[Controller Debug] Received - Email: ${email}, Password: ${password ? '***' : 'N/A'}, Captcha: ${captchaInput}`); // Log inputs (mask password)
 
-        if (!req.session.captcha || captchaInput !== req.session.captcha) {
+        // 1. CAPTCHA Check
+        console.log(`[Controller Debug] Checking CAPTCHA. Session: ${req.session?.captcha}, Input: ${captchaInput}`);
+        if (!req.session || !req.session.captcha || captchaInput !== req.session.captcha) {
+            console.log('[Controller Debug] CAPTCHA Check Failed');
             return res.status(401).json({ error: "❌ Incorrect CAPTCHA" });
         }
         req.session.captcha = null;
+        console.log('[Controller Debug] CAPTCHA Check Passed, cleared session captcha');
 
+        // 2. Find User
+        console.log(`[Controller Debug] Finding user for email: ${email}`);
         const user = await UserModel.findByEmail(email);
-        if (!user || !(await bcrypt.compare(password, user.user_password))) {
-            return res.status(401).json({ error: "Invalid email or password" });
+        // Be careful logging user object if it contains sensitive data beyond password hash
+        console.log('[Controller Debug] User found:', user ? {id: user.user_id, role: user.user_role, hasPassword: !!user.user_password} : null);
+
+        // 3. Validate User and Password
+        console.log('[Controller Debug] Entering password check block...');
+        let passwordMatch = false; // Variable to store compare result
+
+        if (user && user.user_password) { // Check user and password hash exist
+             console.log(`[Controller Debug] User exists with password hash. Attempting bcrypt.compare...`);
+             try {
+                 // --- THE CRITICAL LINE ---
+                 passwordMatch = await bcrypt.compare(password, user.user_password);
+                 // --- END CRITICAL LINE ---
+                 console.log(`[Controller Debug] bcrypt.compare finished. Result: ${passwordMatch}`);
+             } catch (compareError) {
+                 console.error('[Controller Debug] Error DURING bcrypt.compare:', compareError);
+                 // Re-throw the error so it's caught by the main try/catch
+                 throw compareError;
+             }
+        } else {
+            console.log(`[Controller Debug] Skipping bcrypt.compare. User found: ${!!user}, User password hash exists: ${!!user?.user_password}`);
         }
 
-        const token = generateToken(user.user_id, user.user_role);
-        console.log("Generated Token:", token);
+        // Evaluate condition based on results
+        if (!user || !passwordMatch) {
+             console.log(`[Controller Debug] Login check FAILED. User exists: ${!!user}, Password matched: ${passwordMatch}`);
+            return res.status(401).json({ error: "Invalid email or password" });
+        }
+        console.log('[Controller Debug] Password check PASSED.');
 
+        // 4. Generate Token
+        console.log(`[Controller Debug] Generating token for user ID: ${user.user_id}, role: ${user.user_role}`);
+        const token = generateToken(user.user_id, user.user_role);
+        console.log("[Controller Debug] Token generated.");
+
+        // 5. Set Cookie
+        console.log("[Controller Debug] Setting cookie...");
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "Strict",
             maxAge: 15 * 60 * 1000
         });
+        console.log("[Controller Debug] Cookie set.");
 
+        // 6. Send Success Response
+        console.log("[Controller Debug] Sending success response.");
         res.json({
             message: "✅ Login successful!",
             redirectUrl: "/patients",
         });
+        console.log('[Controller Debug] --- loginUser END (Success) ---');
 
     } catch (error) {
-        console.error("Login Error:", error);
+        // Log the error caught by the main try/catch
+        console.error("[Controller Debug] CAUGHT ERROR in loginUser:", error);
+        // Keep original log for consistency if needed
+        // console.error("Login Error:", error);
         res.status(500).json({ error: "❌ Server error during login" });
+        console.log('[Controller Debug] --- loginUser END (Error) ---');
     }
 };
-
-exports.signupPetOwnerStep1 = async (req, res) => {
-    const { fname, lname, email, contact, address, password, confirmPassword } = req.body;
-
-    if (!fname || !lname || !email || !contact || !address || !password || !confirmPassword) {
-        return res.status(400).json({ error: "❌ All fields are required!" });
-    }
-    if (password !== confirmPassword) {
-        return res.status(400).json({ error: "❌ Passwords do not match!" });
-    }
-
-    try {
-        if (await UserModel.isEmailTaken(email)) {
-            return res.status(400).json({ error: "❌ Email already in use." });
-        }
-
-        req.session.petOwnerData = {
-            fname, lname, email, contact, address, password: await hashPassword(password)
-        };
-        req.session.step1Completed = true;
-
-        res.json({
-            message: "✅ Step 1 completed. Proceed to pet info.",
-            redirectUrl: "/signup-petowner-petinfo"
-        });
-    } catch (error) {
-        console.error("Signup Error:", error);
-        res.status(500).json({ error: "❌ Server error during signup." });
-    }
-};
-
-exports.signupPetOwnerStep2 = async (req, res) => {
-    const { petname, gender, speciesDescription, breed, birthdate, altPerson1, altContact1, captchaInput } = req.body;
-
-    if (!req.session.captcha || captchaInput !== req.session.captcha) {
-        console.log("❌ CAPTCHA Mismatch! Expected:", req.session.captcha, "Received:", req.body.captchaInput);
-        return res.status(400).json({ error: "❌ Incorrect CAPTCHA!" });
-    }
-    req.session.captcha = null;
-
-    if (!req.session.petOwnerData || !req.session.step1Completed) {
-        return res.status(400).json({ error: "❌ Personal info missing or Step 1 not completed. Restart signup process." });
-    }
-
-    const { fname, lname, email, contact, address, password } = req.session.petOwnerData;
-
-    try {
-        // Fetch the species ID based on the species description
-        const species = await PetModel.findSpeciesByDescription(speciesDescription);
-        if (!species) {
-            return res.status(400).json({ error: "❌ Invalid species selected." });
-        }
-        const speciesId = species.spec_id;
-
-        console.log("Creating pet owner...");
-        const userId = await UserModel.createPetOwner({ fname, lname, email, contact, address, password, altPerson1, altContact1 });
-        console.log("Pet owner created with ID:", userId);
-
-        console.log("Creating pet...");
-        const petId = await PetModel.createPet({ petname, gender, speciesId, breed, birthdate, userId });
-        console.log("Pet created with ID:", petId);
-
-        await PetModel.createPet({ petname, gender, species, breed, birthdate: petBirthday, userId });
-        const token = generateToken(userId, "owner");
-        console.log('Generated Token:', token);
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "Strict",
-            maxAge: 15 * 60 * 1000
-        });
-
-        req.session.petOwnerData = null;
-        req.session.step1Completed = null;
-        res.status(201).json({ message: "✅ Pet Owner account created successfully!" });
-    } catch (error) {
-        console.error("Signup Error:", error.message);
-        res.status(500).json({ error: "❌ Server error during signup." });
-    }
-};
-
-// employee signup
-exports.signupEmployeeRequest = async (req, res) => {
-    const { fname, lname, email, role, password, confirmPassword, captchaInput } = req.body;
-
-    if (!req.session.captcha || captchaInput !== req.session.captcha) {
-        return res.status(400).json({ error: "❌ Incorrect CAPTCHA!" });
-    }
-    req.session.captcha = null;
-
-    if (!fname || !lname || !email || !role || !password || !confirmPassword) {
-        return res.status(400).json({ error: "❌ All fields are required!" });
-    }
-
-    if (password !== confirmPassword) {
-        return res.status(400).json({ error: "❌ Passwords do not match!" });
-    }
-
-    try {
-        const existingUser = await UserModel.findByEmail(email);
-        if (existingUser) {
-            return res.status(400).json({ error: "❌ Email already in use." });
-        }
-
-        // Generate access code
-        const accessCode = crypto.randomBytes(4).toString("hex").toUpperCase();
-
-        // Store employee signup data in session
-        req.session.employeeData = { fname, lname, email, role, password, accessCode };
-
-        // Send email to clinic owner
-        const clinicOwnerEmail = process.env.CLINIC_OWNER_EMAIL;
-        const subject = "New Employee Signup Request - PAWtient Tracker";
-        const body = `Hello Clinic Owner,\n\nA new employee has requested to sign up:\n\nName: ${fname} ${lname}\nEmail: ${email}\nPosition: ${role}\n\nTo approve, provide them with the following access code:\n\nAccess Code: ${accessCode}\n\nIf this request is unauthorized, please ignore this email.`;
-
-        await sendEmail(clinicOwnerEmail, subject, body);
-
-        res.json({
-            message: "✅ Signup request sent. Await access code from the clinic owner.",
-            redirectUrl: "/signup-employee-accesscode",
-        });
-    } catch (err) {
-        console.error("Database Error:", err);
-        res.status(500).json({ error: "❌ Server error." });
-    }
-};
-
-// Complete Employee Signup
-exports.signupEmployeeComplete = async (req, res) => {
-    const { accessCode } = req.body;
-
-    if (!accessCode) {
-        return res.status(400).json({ error: "❌ Access code is required!" });
-    }
-
-    try {
-        if (!req.session.employeeData) {
-            return res.status(400).json({ error: "❌ No signup request found. Please start again." });
-        }
-
-        const { fname, lname, role, password, accessCode: storedCode, email } = req.session.employeeData;
-
-        if (accessCode !== storedCode) {
-            return res.status(400).json({ error: "❌ Invalid access code." });
-        }
-
-        const hashedPassword = await hashPassword(password);
-        const userId = await UserModel.createEmployee({ fname, lname, email, role, hashedPassword });
-
-        const token = generateToken(userId, role);
-        console.log('Generated Token:', token);
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "Strict",
-            maxAge: 15 * 60 * 1000
-        });
-
-        req.session.employeeData = null;
-
-        res.json({
-            message: "✅ Signup successful! You can now log in.",
-            redirectUrl: "/patients",
-        });
-    } catch (error) {
-        console.error("Employee Signup Error:", error);
-        res.status(500).json({ error: "❌ Server error." });
-    }
-};
-
-// user logout
-exports.logoutUser = (req, res) => {
-    try {
-        req.session.destroy((err) => {
-            if (err) {
-                return res.status(500).json({ message: "Logout failed" });
-            }
-
-            // Clear session and authentication cookies
-            res.clearCookie("connect.sid", { path: "/" });
-            res.clearCookie("token", { path: "/" });
-
-            return res.json({ message: "Logout successful" });
-        });
-    } catch (error) {
-        console.error("Logout Error:", error);
-        return res.status(500).json({ error: "❌ Server error during logout" });
-    }
-};
-
-
