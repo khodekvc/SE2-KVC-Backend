@@ -75,12 +75,19 @@ exports.changePassword = [
     authenticate,
     async (req, res) => {
         const { currentPassword, newPassword, confirmNewPassword } = req.body;
-        const userId = req.user.userId;
 
-        if (!userId) {
+        // --- FIX: Check req.user FIRST ---
+        // If req.user doesn't exist or doesn't have userId, the user is not authenticated properly.
+        if (!req.user || !req.user.userId) {
+            // Log for debugging if needed: console.log("Auth check failed: req.user is", req.user);
             return res.status(401).json({ error: "❌ Unauthorized. Please log in." });
         }
+        // --- END FIX ---
 
+        // Now it's safe to access userId
+        const userId = req.user.userId;
+
+        // Continue with the rest of the validation
         if (!currentPassword || !newPassword || !confirmNewPassword) {
             return res.status(400).json({ error: "❌ All fields are required!" });
         }
@@ -94,6 +101,8 @@ exports.changePassword = [
             const storedPassword = await UserModel.getPasswordById(userId);
 
             if (!storedPassword) {
+                // It's unlikely to hit this if authenticated, but good to keep
+                console.warn(`User with authenticated ID ${userId} not found in DB for password change.`);
                 return res.status(404).json({ error: "❌ User not found." });
             }
 
@@ -112,7 +121,7 @@ exports.changePassword = [
 
             res.json({ message: "✅ Password changed successfully!" });
         } catch (error) {
-            console.error("Password Change Error:", error);
+            console.error(`Password Change Error for user ${userId}:`, error); // Add userId to error log
             res.status(500).json({ error: "❌ Server error while changing password." });
         }
     }
