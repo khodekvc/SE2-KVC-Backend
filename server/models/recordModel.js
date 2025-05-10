@@ -70,11 +70,6 @@ const updateRecordInDB = async (recordId, recordData) => {
     return result.affectedRows;
 };
 
-
-
-
-
-
 const getRecordById = async (recordId) => {
     const [result] = await db.query("SELECT * FROM record_info WHERE record_id = ?", [recordId]);
     return result.length ? result[0] : null;

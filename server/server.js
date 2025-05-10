@@ -70,6 +70,8 @@ app.get("/protected-route", authenticate, (req, res) => {
     res.json({ message: "✅ Access granted!", user: req.user });
 });
 
+app.use(session({ secret: "your-secret-key", resave: false, saveUninitialized: true }));
+
 
 // route handlers
 app.use("/auth", authRoutes);

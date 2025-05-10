@@ -59,15 +59,15 @@ class UserModel {
         );
     }
 
-    static async updateOwnerProfile(userId, firstname, lastname, email, contact, address, altperson, altcontact) {
+    static async updateOwnerProfile(userId, firstname, lastname, email, contact, address, altPerson1, altContact1, altPerson2, altContact2) {
         await db.execute(
             "UPDATE users SET user_firstname = ?, user_lastname = ?, user_email = ?, user_contact = ? WHERE user_id = ?",
             [firstname, lastname, email, contact, userId]
         );
 
         await db.execute(
-            "UPDATE owner SET owner_address = ?, owner_alt_person1 = ?, owner_alt_contact1 = ? WHERE user_id = ?",
-            [address, altperson, altcontact, userId]
+            "UPDATE owner SET owner_address = ?, owner_alt_person1 = ?, owner_alt_contact1 = ?, owner_alt_person2 = ?, owner_alt_contact2 = ? WHERE user_id = ?",
+            [address, altPerson1, altContact1, altPerson2, altContact2, userId]
         );
     }
 }
